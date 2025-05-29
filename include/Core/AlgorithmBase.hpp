@@ -12,12 +12,12 @@ class AlgorithmBase
 public:
 
     AlgorithmBase() = default;
-    AlgorithmBase(const model::CNF& kCNF);
-    AlgorithmBase(model::CNF&& cnf) noexcept;
+    AlgorithmBase( const model::CNF& kCNF );
+    AlgorithmBase( model::CNF&& cnf ) noexcept;
 
     virtual ~AlgorithmBase() = default;
 
-    virtual ExecutionResul Execute(const Args... args) = 0;
+    virtual ExecutionResul Execute( const Args... args ) = 0;
 
 
 protected:

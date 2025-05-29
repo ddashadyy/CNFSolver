@@ -12,7 +12,7 @@ class Candidate final
 public:
     Candidate() = default;
     
-    explicit Candidate( const std::size_t kFunctionLength );
+    explicit Candidate( const std::uint32_t kFunctionLength );
     Candidate( const std::string& kString );
     Candidate( std::string&& string );
 
@@ -24,7 +24,7 @@ public:
     void EvaluateQualityFunction(const CNF& kCNF);
 
 private:
-    std::string GenerateRandomBooleanFunction(const std::size_t kLength) const;
+    std::string GenerateRandomBooleanFunction(const std::uint32_t kLength) const;
     bool EvaluateDisjunct(const std::string& kDisjunct) const;
 
     std::string function_;

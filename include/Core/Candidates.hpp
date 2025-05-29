@@ -12,8 +12,8 @@ class Candidates final
 public:
     Candidates() = default;
     explicit Candidates(
-        const std::size_t kAmountCandidates,
-        const std::size_t kFunctionLength
+        const std::uint32_t kAmountCandidates,
+        const std::uint32_t kFunctionLength
     );
 
     ~Candidates() = default;
