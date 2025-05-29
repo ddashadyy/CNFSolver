@@ -8,14 +8,14 @@
 namespace model
 {
 
-CNF::CNF(const std::size_t kAmountVariables)
+CNF::CNF(const std::uint32_t kAmountVariables)
 {
     std::ofstream cnf_out;
     cnf_out.open("cnf.txt");
 
     if (cnf_out.is_open())
     {
-        auto cnf = GenerateRandomCNF(kAmountVariables, kAmountVariables + 70, kAmountVariables + 20);
+        auto cnf = GenerateRandomCNF(kAmountVariables, kAmountVariables * kAmountVariables, kAmountVariables + kAmountVariables);
         cnf_out << cnf;
 
         this->cnf_str_ = cnf;
@@ -57,39 +57,38 @@ std::vector<std::string> CNF::SplitCNF() const
 }
 
 std::string CNF::GenerateRandomCNF(
-    const std::size_t kVariableNumber, 
-    const std::size_t kClauseLength, 
-    const std::size_t kMaxClauseLength
+    const std::uint32_t kVariableNumber, 
+    const std::uint32_t kClauseLength, 
+    const std::uint32_t kMaxClauseLength
 ) const
 {
     if (kVariableNumber == 0 || kClauseLength == 0 || kMaxClauseLength == 0)
         return "";
 
-    // Инициализация генератора случайных чисел
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<size_t> clause_len_dist(1, kMaxClauseLength);
-    std::uniform_int_distribution<size_t> var_dist(0, kVariableNumber - 1);
-    std::bernoulli_distribution neg_dist(0.33); // Вероятность отрицания ~1/3
+    std::uniform_int_distribution<std::uint32_t> clause_len_dist(1, kMaxClauseLength);
+    std::uniform_int_distribution<std::uint32_t> var_dist(0, kVariableNumber - 1);
+    std::bernoulli_distribution neg_dist(0.33); 
 
     std::vector<std::string> variables;
-    for (size_t i = 0; i < kVariableNumber; ++i)
+    for (std::uint32_t i = 0; i < kVariableNumber; ++i)
         variables.push_back("x" + std::to_string(i + 1));
 
     std::string cnf_str;
 
-    for (size_t i = 0; i < kClauseLength; ++i)
+    for (std::uint32_t i = 0; i < kClauseLength; ++i)
     {
         cnf_str += "(";
 
-        size_t clause_len = clause_len_dist(gen);
+        std::uint32_t clause_len = clause_len_dist(gen);
         std::vector<bool> used_vars(kVariableNumber, false);
-        size_t vars_in_clause = 0;
+        std::uint32_t vars_in_clause = 0;
 
-        for (size_t j = 0; j < clause_len; ++j)
+        for (std::uint32_t j = 0; j < clause_len; ++j)
         {
-            size_t var_idx;
-            size_t attempts = 0;
+            std::uint32_t var_idx;
+            std::uint32_t attempts = 0;
 
             do
             {
@@ -134,11 +133,11 @@ std::string CNF::TrimAndCLean(const std::string& kString) const
     if (kString.empty())
         return kString;
 
-    size_t start = kString.find_first_not_of(" \t()");
+    std::size_t start = kString.find_first_not_of(" \t()");
     if (start == std::string::npos)
         return "";
 
-    size_t end = kString.find_last_not_of(" \t()");
+    std::size_t end = kString.find_last_not_of(" \t()");
     return kString.substr(start, end - start + 1);
 }
 

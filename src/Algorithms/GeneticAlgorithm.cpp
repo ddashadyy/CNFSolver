@@ -20,22 +20,22 @@ GeneticAlgorithm::GeneticAlgorithm(
 ) noexcept : AlgorithmBase(std::move(cnf)), candidates_(candidates) {}
 
 utils::GAExecutionResult GeneticAlgorithm::Execute(
-    const std::size_t kIterations, 
-    const std::size_t kPopulation, 
-    const std::size_t kCrossovers, 
-    const std::size_t kMutations, 
-    const std::size_t kAmountGensMutation, 
+    const std::uint32_t kIterations, 
+    const std::uint32_t kPopulation, 
+    const std::uint32_t kCrossovers, 
+    const std::uint32_t kMutations, 
+    const std::uint32_t kAmountGensMutation, 
     utils::selection_function sf
 )
 {
     const auto kStartTime = std::chrono::high_resolution_clock::now();
 
     auto& candidates = this->candidates_.GetCandidates();
-    std::size_t iteration_counter = 0;
+    std::uint32_t iteration_counter = 0;
 
     std::vector<double> best_qualities;
 
-    for (std::size_t i = 0; i < kIterations; i++)
+    for (std::uint32_t i = 0; i < kIterations; i++)
     {
         for (auto& candidate : candidates)
         {
@@ -51,7 +51,7 @@ utils::GAExecutionResult GeneticAlgorithm::Execute(
                         iteration_counter,
                         std::vector<double>{candidate.GetQuality()},
                         candidate.GetFunction(),
-                        static_cast<std::size_t>(kDuration)
+                        static_cast<std::uint32_t>(kDuration)
                     };
                 
                 best_qualities.emplace_back(1.0);
@@ -60,7 +60,7 @@ utils::GAExecutionResult GeneticAlgorithm::Execute(
                         iteration_counter,
                         best_qualities,
                         candidate.GetFunction(),
-                        static_cast<std::size_t>(kDuration)
+                        static_cast<std::uint32_t>(kDuration)
                     };
             }
         }
@@ -80,14 +80,14 @@ utils::GAExecutionResult GeneticAlgorithm::Execute(
         iteration_counter, 
         best_qualities, 
         std::string{"there is no solution"},
-        static_cast<std::size_t>(kDuration)
+        static_cast<std::uint32_t>(kDuration)
     };
 }
 
 void GeneticAlgorithm::Crossover(
     std::vector<model::Candidate>& candidates, 
-    const std::size_t kCrossovers, 
-    const std::size_t kPopulation,
+    const std::uint32_t kCrossovers, 
+    const std::uint32_t kPopulation,
     utils::selection_function sf
 )
 {
@@ -96,13 +96,13 @@ void GeneticAlgorithm::Crossover(
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::size_t func_size = candidates[0].GetFunction().size();
-    std::uniform_int_distribution<std::size_t> distrib(0, candidates.size() - 1);
+    std::uint32_t func_size = candidates[0].GetFunction().size();
+    std::uniform_int_distribution<std::uint32_t> distrib(0, candidates.size() - 1);
 
-    for (std::size_t i = 0; i < kCrossovers && candidates.size() < kPopulation; i++)
+    for (std::uint32_t i = 0; i < kCrossovers && candidates.size() < kPopulation; i++)
     {
-        std::size_t first_parent_index = 0;
-        std::size_t second_parent_index = 0;
+        std::uint32_t first_parent_index = 0;
+        std::uint32_t second_parent_index = 0;
 
         do 
         {
@@ -141,8 +141,8 @@ void GeneticAlgorithm::Crossover(
             }
         } while (first_parent_index == second_parent_index);
 
-        std::uniform_int_distribution<std::size_t> distrib_point(1, func_size - 1);
-        std::size_t point = distrib_point(gen);
+        std::uniform_int_distribution<std::uint32_t> distrib_point(1, func_size - 1);
+        std::uint32_t point = distrib_point(gen);
 
 
         std::string child =
@@ -155,19 +155,19 @@ void GeneticAlgorithm::Crossover(
 
 void GeneticAlgorithm::Mutate(
     std::vector<model::Candidate>& candidates, 
-    const std::size_t kPopulation, 
-    const std::size_t kMutations, 
-    const std::size_t kAmountGensMutation,
+    const std::uint32_t kPopulation, 
+    const std::uint32_t kMutations, 
+    const std::uint32_t kAmountGensMutation,
     utils::selection_function sf
 )
 {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<std::size_t> distrib(0, kPopulation - 1);
+    std::uniform_int_distribution<std::uint32_t> distrib(0, kPopulation - 1);
 
-    for (std::size_t i = 0; i < kMutations; i++)
+    for (std::uint32_t i = 0; i < kMutations; i++)
     {
-        std::size_t candidate_index_to_mutate = 0;
+        std::uint32_t candidate_index_to_mutate = 0;
 
         switch (sf)
         {
@@ -187,10 +187,10 @@ void GeneticAlgorithm::Mutate(
             break;
         }
 
-        for (std::size_t j = 0; j < kAmountGensMutation; j++)
+        for (std::uint32_t j = 0; j < kAmountGensMutation; j++)
         {
-            std::uniform_int_distribution<std::size_t> distrib(0, candidates[i].GetFunction().size() - 1);
-            std::size_t mutation_point = distrib(gen);
+            std::uniform_int_distribution<std::uint32_t> distrib(0, candidates[i].GetFunction().size() - 1);
+            std::uint32_t mutation_point = distrib(gen);
 
             candidates[candidate_index_to_mutate].GetFunction()[mutation_point] =
                 (candidates[candidate_index_to_mutate].GetFunction()[mutation_point] == '0') ? '1' : '0';
@@ -200,7 +200,7 @@ void GeneticAlgorithm::Mutate(
 
 void GeneticAlgorithm::DoSelection(
     std::vector<model::Candidate>& candidates, 
-    const std::size_t kPopulation
+    const std::uint32_t kPopulation
 )
 {
     std::sort(candidates.begin(), candidates.end(), [](const model::Candidate &lhs, const model::Candidate &rhs)

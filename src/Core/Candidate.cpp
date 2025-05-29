@@ -6,9 +6,9 @@
 namespace model
 {
 
-Candidate::Candidate(const std::size_t kFunctionLength) : quality_(0.0)
+Candidate::Candidate(const std::uint32_t kFunctionLength) : quality_(0.0)
 {
-    this->function_ = GenerateRandomBooleanFunction(kFunctionLength);
+    this->function_ = std::move(GenerateRandomBooleanFunction(kFunctionLength));
 
     std::ofstream candidate_out;
     candidate_out.open("candidate.txt");
@@ -48,7 +48,7 @@ double Candidate::GetQuality() const
 void Candidate::EvaluateQualityFunction(const CNF& kCNF)
 {
     auto disjuncts = kCNF.SplitCNF();
-    size_t quality_counter = 0;
+    std::uint32_t quality_counter = 0;
 
     for (const auto &disjunct : disjuncts)
         if (EvaluateDisjunct(disjunct))
@@ -57,7 +57,7 @@ void Candidate::EvaluateQualityFunction(const CNF& kCNF)
     this->quality_ = static_cast<double>(quality_counter) / disjuncts.size();
 }
 
-std::string Candidate::GenerateRandomBooleanFunction(const std::size_t kLength) const
+std::string Candidate::GenerateRandomBooleanFunction(const std::uint32_t kLength) const
 {
     if (kLength == 0 || kLength > 64)
         throw std::invalid_argument("Function length must be between 1 and 64");
@@ -69,7 +69,7 @@ std::string Candidate::GenerateRandomBooleanFunction(const std::size_t kLength) 
     std::string function;
     function.resize(kLength);
 
-    for (size_t i = 0; i < kLength; ++i)
+    for (std::uint32_t i = 0; i < kLength; ++i)
         function[i] = distrib(gen) ? '1' : '0';
 
     return function;
@@ -80,7 +80,7 @@ bool Candidate::EvaluateDisjunct(const std::string& kDisjunct) const
     if (kDisjunct.empty() || this->function_.empty())
         return false;
 
-    size_t pos = 0;
+    std::uint32_t pos = 0;
     while (pos < kDisjunct.length())
     {
         while (pos < kDisjunct.length() && kDisjunct[pos] == ' ')

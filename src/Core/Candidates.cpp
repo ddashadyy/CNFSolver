@@ -6,8 +6,8 @@ namespace model
 {
 
 Candidates::Candidates(
-    const std::size_t kAmountCandidates,
-    const std::size_t kFunctionLength
+    const std::uint32_t kAmountCandidates,
+    const std::uint32_t kFunctionLength
 )
 {
     std::ofstream candidates_out("candidates.txt");
