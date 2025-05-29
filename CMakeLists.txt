@@ -31,7 +31,7 @@ add_library(${PROJECT_NAME}_objs OBJECT
 
 add_library(${PROJECT_NAME}_wnd_objs OBJECT
     src/UI/MainWindow.cpp
-    # src/UI/GAWindow.cpp
+    src/UI/GAWindow.cpp
     # src/UI/SAWindow.cpp
     # src/UI/GraphWindow.cpp
     # src/UI/Utils.cpp
@@ -54,6 +54,7 @@ if(WIN32)
         comdlg32.lib
         advapi32.lib
         gdiplus.lib
+        comctl32.lib
     )
 
     target_link_libraries(${PROJECT_NAME}_wnd_objs PRIVATE ${WIN32_LIBS})
