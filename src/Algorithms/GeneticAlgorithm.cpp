@@ -45,14 +45,6 @@ const utils::GAExecutionResult GeneticAlgorithm::Execute(
                 const auto kEndTime = std::chrono::high_resolution_clock::now();
                 const auto kDuration = std::chrono::duration_cast<std::chrono::milliseconds>(kEndTime - kStartTime).count();
 
-                if (i == 0)
-                    return utils::GAExecutionResult{
-                        i,
-                        std::vector<double>{candidate.GetQuality()},
-                        candidate.GetFunction(),
-                        static_cast<std::uint32_t>(kDuration)
-                    };
-                
                 best_qualities.emplace_back(1.0);
 
                 return utils::GAExecutionResult{
@@ -77,7 +69,7 @@ const utils::GAExecutionResult GeneticAlgorithm::Execute(
     return utils::GAExecutionResult{
         kIterations, 
         best_qualities, 
-        std::string{"there is no solution"},
+        std::string{"Not enough iterations.\nPropably there is no solution."},
         static_cast<std::uint32_t>(kDuration)
     };
 }
