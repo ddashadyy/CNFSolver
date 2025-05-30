@@ -37,5 +37,12 @@ struct GraphData
     std::wstring title_;
 };
 
+bool DoubleEqual(const double lhs, const double rhs);
+
+bool DoubleLess(const double lhs, const double rhs);
+bool DoubleGreater(const double lhs, const double rhs);
+bool DoubleLessOrEqual(const double lhs, const double rhs);
+bool DoubleGreaterOrEqual(const double lhs, const double rhs);
+
 
 } // namespace utils
