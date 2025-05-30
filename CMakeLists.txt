@@ -34,7 +34,7 @@ add_library(${PROJECT_NAME}_objs OBJECT
 add_library(${PROJECT_NAME}_wnd_objs OBJECT
     src/UI/MainWindow.cpp
     src/UI/GAWindow.cpp
-    # src/UI/SAWindow.cpp
+    src/UI/SAWindow.cpp
     src/UI/GraphWindow.cpp
 )
 
