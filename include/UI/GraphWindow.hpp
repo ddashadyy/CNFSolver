@@ -11,7 +11,7 @@
 namespace ui 
 {
 
-class GraphWindow 
+class GraphWindow final 
 {
 public:
     static bool RegisterGWClass(HINSTANCE hInstance);

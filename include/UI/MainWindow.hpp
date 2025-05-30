@@ -9,7 +9,7 @@ constexpr int ID_BUTTON_GA = 1001;
 constexpr int ID_BUTTON_SA = 1002;
 constexpr int ID_BUTTON_HELP = 1003;
 
-class MainWindow 
+class MainWindow final 
 {
 public:
     static bool RegisterMWClass(HINSTANCE hInstance);

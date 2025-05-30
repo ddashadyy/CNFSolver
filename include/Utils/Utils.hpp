@@ -10,7 +10,7 @@ namespace utils
 constexpr double EPSILON = std::numeric_limits<double>::epsilon() * 10;
 
 
-struct GAExecutionResult
+struct GAExecutionResult final
 {
     std::uint32_t iterations_; 
     std::vector<double> best_qualities_; 
@@ -19,7 +19,7 @@ struct GAExecutionResult
     std::uint32_t duration_;
 };
 
-struct SAExecutionResult
+struct SAExecutionResult final
 {
     std::uint32_t iterations_;
     
@@ -31,7 +31,7 @@ struct SAExecutionResult
     std::uint32_t duration_;
 };
 
-struct GraphData
+struct GraphData final
 {
     std::vector<double> data_;
     std::wstring title_;

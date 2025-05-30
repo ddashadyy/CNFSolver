@@ -10,7 +10,7 @@
 namespace ui
 {
     
-class GAWindow 
+class GAWindow final 
 {
 public:
     static bool RegisterGAClass(HINSTANCE hInstance);
