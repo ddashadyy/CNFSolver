@@ -179,15 +179,15 @@ void GAWindow::CreateControls(HWND hWnd)
 
     CreateWindowW(L"BUTTON", L"Загрузить КНФ из файла",
                     WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
-                    20, 360, 180, 30, hWnd, (HMENU)IDC_LOAD_CNF_BTN, NULL, NULL);
+                    20, 320, 180, 30, hWnd, (HMENU)IDC_LOAD_CNF_BTN, NULL, NULL);
 
     CreateWindowW(L"BUTTON", L"Загрузить кандидатов из файла",
                     WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
-                    220, 360, 180, 30, hWnd, (HMENU)IDC_LOAD_CANDIDATES_BTN, NULL, NULL);
+                    220, 320, 180, 30, hWnd, (HMENU)IDC_LOAD_CANDIDATES_BTN, NULL, NULL);
 
     CreateWindowW(L"BUTTON", L"Выполнить алгоритм",
                     WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
-                    20, 320, 380, 30, hWnd, (HMENU)IDC_RUN_BTN, NULL, NULL);
+                    20, 360, 380, 30, hWnd, (HMENU)IDC_RUN_BTN, NULL, NULL);
 
     EnumChildWindows(
         hWnd, 
