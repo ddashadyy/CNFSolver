@@ -202,10 +202,11 @@ void GAWindow::CreateControls(HWND hWnd)
 
 void GAWindow::OnCommand(HWND hWnd, int controlId) 
 {
-    switch (controlId) {
+    switch (controlId) 
+    {
         case IDC_GENERATE_CNF_BTN: 
         {
-            int varCount = GetDlgItemInt(hWnd, IDC_VARIABLES_EDIT, nullptr, FALSE);
+            const std::uint32_t kVarCount = GetDlgItemInt(hWnd, IDC_VARIABLES_EDIT, nullptr, FALSE);
 
             if (currentCNF != nullptr) 
             {
@@ -213,7 +214,7 @@ void GAWindow::OnCommand(HWND hWnd, int controlId)
                 currentCNF = nullptr;
             }
             
-            currentCNF = new model::CNF(varCount);
+            currentCNF = new model::CNF(kVarCount);
 
             MessageBoxW(hWnd, L"CNF generated successfully", L"Success", MB_OK);
             break;
@@ -221,8 +222,8 @@ void GAWindow::OnCommand(HWND hWnd, int controlId)
         
         case IDC_GENERATE_CANDIDATES_BTN: 
         {
-            int popSize = GetDlgItemInt(hWnd, IDC_POPULATION_EDIT, nullptr, FALSE);
-            int varCount = GetDlgItemInt(hWnd, IDC_VARIABLES_EDIT, nullptr, FALSE);
+            const std::uint32_t kPopSize = GetDlgItemInt(hWnd, IDC_POPULATION_EDIT, nullptr, FALSE);
+            const std::uint32_t kVarCount = GetDlgItemInt(hWnd, IDC_VARIABLES_EDIT, nullptr, FALSE);
 
             if (currentCandidates != nullptr) 
             {
@@ -230,7 +231,7 @@ void GAWindow::OnCommand(HWND hWnd, int controlId)
                 currentCandidates = nullptr;
             }
 
-            currentCandidates = new model::Candidates(popSize, varCount);
+            currentCandidates = new model::Candidates(kPopSize, kVarCount);
 
             MessageBoxW(hWnd, L"Candidates generated successfully", L"Success", MB_OK);
             break;
@@ -270,11 +271,11 @@ void GAWindow::RunAlgorithm(HWND hWnd)
 
     try 
     {
-        int iterations = GetDlgItemInt(hWnd, IDC_ITERATIONS_EDIT, nullptr, FALSE);
-        int population = GetDlgItemInt(hWnd, IDC_POPULATION_EDIT, nullptr, FALSE);
-        int crossovers = GetDlgItemInt(hWnd, IDC_CROSSOVERS_EDIT, nullptr, FALSE);
-        int mutations = GetDlgItemInt(hWnd, IDC_MUTATIONS_EDIT, nullptr, FALSE);
-        int genesToMutate = GetDlgItemInt(hWnd, IDC_GENES_EDIT, nullptr, FALSE);
+        const std::uint32_t kIterations = GetDlgItemInt(hWnd, IDC_ITERATIONS_EDIT, nullptr, FALSE);
+        const std::uint32_t kPopulation = GetDlgItemInt(hWnd, IDC_POPULATION_EDIT, nullptr, FALSE);
+        const std::uint32_t kCrossovers = GetDlgItemInt(hWnd, IDC_CROSSOVERS_EDIT, nullptr, FALSE);
+        const std::uint32_t kMutations = GetDlgItemInt(hWnd, IDC_MUTATIONS_EDIT, nullptr, FALSE);
+        const std::uint32_t kGenesToMutate = GetDlgItemInt(hWnd, IDC_GENES_EDIT, nullptr, FALSE);
         
         HWND hCombo = GetDlgItem(hWnd, IDC_SELECTION_COMBO);
         int selectionMethod = SendMessage(hCombo, CB_GETCURSEL, 0, 0);
@@ -282,11 +283,11 @@ void GAWindow::RunAlgorithm(HWND hWnd)
         currentAlgorithm = new algorithm::GeneticAlgorithm(*currentCNF, *currentCandidates);
         
         const auto result = currentAlgorithm->Execute(
-            iterations, 
-            population, 
-            crossovers, 
-            mutations, 
-            genesToMutate, 
+            kIterations, 
+            kPopulation, 
+            kCrossovers, 
+            kMutations, 
+            kGenesToMutate, 
             static_cast<utils::selection_function>(selectionMethod)
         );
         
@@ -305,7 +306,6 @@ void GAWindow::RunAlgorithm(HWND hWnd)
             return;
         }
 
-
         HWND hGraphWnd = GraphWindow::Create(
             hWnd, 
             hInstance,
@@ -315,8 +315,7 @@ void GAWindow::RunAlgorithm(HWND hWnd)
 
         if (!hGraphWnd) 
             MessageBoxW(hWnd, L"Failed to create graph window", L"Error", MB_ICONERROR);
-        
-
+    
     } 
 
     catch (const std::exception& e) 
