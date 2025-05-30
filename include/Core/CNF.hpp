@@ -12,6 +12,8 @@ class CNF final
 public:
     CNF() = default;
     explicit CNF( const std::uint32_t kAmountVariables );
+    explicit CNF( const std::string& kCNF );
+    explicit CNF( std::string&& cnf ) noexcept;
     ~CNF() = default;
 
     std::string& GetCNF();
