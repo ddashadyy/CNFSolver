@@ -33,7 +33,7 @@ public:
 
     ~GeneticAlgorithm() = default;
 
-    utils::GAExecutionResult Execute(
+    const utils::GAExecutionResult Execute(
         const std::uint32_t kIterations,
         const std::uint32_t kPopulation,
         const std::uint32_t kCrossovers,

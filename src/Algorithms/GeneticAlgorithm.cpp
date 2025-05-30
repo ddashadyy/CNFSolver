@@ -19,7 +19,7 @@ GeneticAlgorithm::GeneticAlgorithm(
     model::Candidates&& candidates
 ) noexcept : AlgorithmBase(std::move(cnf)), candidates_(candidates) {}
 
-utils::GAExecutionResult GeneticAlgorithm::Execute(
+const utils::GAExecutionResult GeneticAlgorithm::Execute(
     const std::uint32_t kIterations, 
     const std::uint32_t kPopulation, 
     const std::uint32_t kCrossovers, 
@@ -31,7 +31,6 @@ utils::GAExecutionResult GeneticAlgorithm::Execute(
     const auto kStartTime = std::chrono::high_resolution_clock::now();
 
     auto& candidates = this->candidates_.GetCandidates();
-    std::uint32_t iteration_counter = 0;
 
     std::vector<double> best_qualities;
 
@@ -40,15 +39,15 @@ utils::GAExecutionResult GeneticAlgorithm::Execute(
         for (auto& candidate : candidates)
         {
             candidate.EvaluateQualityFunction(this->cnf_);
-            if (std::fabs(candidate.GetQuality() - 1.0) < utils::EPSILON)
+            if (utils::DoubleEqual(candidate.GetQuality(), 1.0))
             {
 
                 const auto kEndTime = std::chrono::high_resolution_clock::now();
                 const auto kDuration = std::chrono::duration_cast<std::chrono::milliseconds>(kEndTime - kStartTime).count();
 
-                if (iteration_counter == 0) 
+                if (i == 0)
                     return utils::GAExecutionResult{
-                        iteration_counter,
+                        i,
                         std::vector<double>{candidate.GetQuality()},
                         candidate.GetFunction(),
                         static_cast<std::uint32_t>(kDuration)
@@ -57,7 +56,7 @@ utils::GAExecutionResult GeneticAlgorithm::Execute(
                 best_qualities.emplace_back(1.0);
 
                 return utils::GAExecutionResult{
-                        iteration_counter,
+                        i,
                         best_qualities,
                         candidate.GetFunction(),
                         static_cast<std::uint32_t>(kDuration)
@@ -70,14 +69,13 @@ utils::GAExecutionResult GeneticAlgorithm::Execute(
         DoSelection(candidates, kPopulation);
 
         best_qualities.emplace_back(candidates.front().GetQuality());
-        ++iteration_counter;
     }
 
     const auto kEndTime = std::chrono::high_resolution_clock::now();
     const auto kDuration = std::chrono::duration_cast<std::chrono::milliseconds>(kEndTime - kStartTime).count();
 
     return utils::GAExecutionResult{
-        iteration_counter, 
+        kIterations, 
         best_qualities, 
         std::string{"there is no solution"},
         static_cast<std::uint32_t>(kDuration)
