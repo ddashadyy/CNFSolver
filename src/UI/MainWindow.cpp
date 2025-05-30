@@ -89,6 +89,16 @@ void MainWindow::OnCreate(HWND hWnd)
         nullptr,
         nullptr
     );
+
+    CreateWindowW(
+        L"BUTTON", L"Справка",
+        WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+        100, 190, 200, 30,
+        hWnd,
+        reinterpret_cast<HMENU>(ID_BUTTON_HELP),
+        nullptr,
+        nullptr
+    );
 }
 
 void MainWindow::OnCommand(HWND hWnd, int controlId) 
@@ -112,11 +122,36 @@ void MainWindow::OnCommand(HWND hWnd, int controlId)
         break;
     }
 
-    // case ID_BUTTON_SA:
-    //     if (!SAWindow::Create(hWnd, hInstance)) {
-    //         MessageBoxW(hWnd, L"Failed to create SA window", L"Error", MB_ICONERROR);
-    //     }
-    //     break;
+    case ID_BUTTON_SA:
+    {
+        break;
+    }    
+    
+
+    case ID_BUTTON_HELP:
+    {
+        MessageBoxW(hWnd,
+            L"CNF Solver - программа для решения задачи выполнимости КНФ.\n\n"
+            L"Функции:\n"
+            L"1. Генетический алгоритм - поиск решения с использованием эволюционных методов\n"
+            L"2. Алгоритм имитации отжига - поиск решения методом имитации отжига\n\n"
+            L"Инструкция:\n"
+            L"Если хотите использовать случайные данные:\n"
+            L"1. Выберите алгоритм\n"
+            L"2. Настройте параметры\n"
+            L"3. Запустите расчет\n"
+            L"Если хотите использовать свои данные:\n"
+            L"1. Запиши свои данные в соответсвующие файлы и формате\n"
+            L"Например, КНФ: (x1 | x2 | x3) & (x2 | x1 | x3) & (x3 | x1 | x2)\n"
+            L"Каждый кандидат на решение должен быть записан с новой строки\n"
+            L"2. После загрузки данных заполните параметры алгоритма строго в соответсвии ваших КНФ и кандидатов\n"
+            L"3. Запустите расчет",
+            L"Справка", 
+            MB_OK | MB_ICONINFORMATION
+        );
+        break;
+    }
+
     }
 }
 
