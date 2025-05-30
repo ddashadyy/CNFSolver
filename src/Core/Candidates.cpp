@@ -2,6 +2,7 @@
 
 #include <fstream>
 
+
 namespace model
 {
 
@@ -22,7 +23,13 @@ Candidates::Candidates(
     }
 }
 
-std::vector<Candidate>& Candidates::GetCandidates()
+Candidates::Candidates(const std::vector<Candidate>& kCandidates)
+    : solution_candidates_(kCandidates) {}
+
+Candidates::Candidates(std::vector<Candidate> &&candidates) noexcept
+    : solution_candidates_(std::move(candidates)) {}
+
+std::vector<Candidate> &Candidates::GetCandidates()
 {
     return this->solution_candidates_;
 }

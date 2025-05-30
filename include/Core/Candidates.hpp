@@ -16,6 +16,9 @@ public:
         const std::uint32_t kFunctionLength
     );
 
+    explicit Candidates( const std::vector<Candidate>& kCandidates );
+    explicit Candidates( std::vector<Candidate>&& candidates ) noexcept;
+
     ~Candidates() = default;
 
     std::vector<Candidate>& GetCandidates();
