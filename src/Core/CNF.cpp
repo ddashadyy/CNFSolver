@@ -28,7 +28,7 @@ CNF::CNF(const std::string& kCNF)
     : cnf_str_(kCNF) {}
 
 CNF::CNF(std::string&& cnf) noexcept
-: cnf_str_(std::move(cnf)) {}
+    : cnf_str_(std::move(cnf)) {}
 
 std::string &CNF::GetCNF()
 {
