@@ -281,7 +281,7 @@ void GAWindow::RunAlgorithm(HWND hWnd)
         
         currentAlgorithm = new algorithm::GeneticAlgorithm(*currentCNF, *currentCandidates);
         
-        auto result = currentAlgorithm->Execute(
+        const auto result = currentAlgorithm->Execute(
             iterations, 
             population, 
             crossovers, 
