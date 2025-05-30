@@ -21,8 +21,8 @@ public:
 private:
     static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     
-    // Control IDs
-    enum {
+    enum 
+    {
         IDC_VARIABLES_EDIT = 1001,
         IDC_POPULATION_EDIT,
         IDC_ITERATIONS_EDIT,
@@ -37,21 +37,17 @@ private:
         IDC_RUN_BTN
     };
 
-    // Message handlers
     static void OnCreate(HWND hWnd);
     static void OnCommand(HWND hWnd, int controlId);
     static void OnDestroy(HWND hWnd);
     
-    // Helper methods
     static void CreateControls(HWND hWnd);
     static void RunAlgorithm(HWND hWnd);
 
-    // File operations
     static bool LoadCNFFromFile(HWND hWnd, const std::wstring& filePath);
     static bool LoadCandidatesFromFile(HWND hWnd, const std::wstring& filePath);
     static std::wstring OpenFileDialog(HWND hWnd, const wchar_t* filter);
     
-    // Instance data
     static inline model::CNF* currentCNF = nullptr;
     static inline model::Candidates* currentCandidates = nullptr;
     static inline algorithm::GeneticAlgorithm* currentAlgorithm = nullptr;
