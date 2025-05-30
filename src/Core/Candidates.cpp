@@ -17,7 +17,7 @@ Candidates::Candidates(
 
     for (std::size_t i = 0; i < kAmountCandidates; i++)
     {
-        solution_candidates_.emplace_back(Candidate(kFunctionLength));
+        solution_candidates_.emplace_back(kFunctionLength);
         if (candidates_out.is_open())
             candidates_out << solution_candidates_[i].GetFunction() << '\n';
     }
