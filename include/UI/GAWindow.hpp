@@ -16,7 +16,7 @@ public:
     static bool RegisterGAClass(HINSTANCE hInstance);
     static HWND Create(HWND parentWindow, HINSTANCE hInstance);
     
-    static inline const wchar_t* WINDOW_CLASS = L"CNF_Solver_GAWindow";
+    static constexpr wchar_t* WINDOW_CLASS = L"CNF_Solver_GAWindow";
 
 private:
     static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

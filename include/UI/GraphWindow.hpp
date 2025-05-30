@@ -22,7 +22,7 @@ public:
         const std::wstring& title
     );
 
-    static inline const wchar_t* WindowClass = L"CNF_Solver_GraphWindow";
+    static constexpr wchar_t* WindowClass = L"CNF_Solver_GraphWindow";
 
 private:
     static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
