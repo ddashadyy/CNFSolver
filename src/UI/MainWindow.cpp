@@ -1,6 +1,6 @@
 #include <UI/MainWindow.hpp>
 #include <UI/GAWindow.hpp>
-// #include "UI/SAWindow.hpp"
+#include "UI/SAWindow.hpp"
 
 #include <stdexcept>
 
@@ -124,6 +124,14 @@ void MainWindow::OnCommand(HWND hWnd, int controlId)
 
     case ID_BUTTON_SA:
     {
+        HWND hGAWnd = SAWindow::Create(hWnd, hInstance);
+        if (!hGAWnd) 
+            MessageBoxW(hWnd, L"Failed to create GA window", L"Error", MB_ICONERROR);
+        else 
+        {
+            ShowWindow(hGAWnd, SW_SHOW);
+            UpdateWindow(hGAWnd);
+        }
         break;
     }    
     
