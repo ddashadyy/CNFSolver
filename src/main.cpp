@@ -62,29 +62,6 @@ int WINAPI wWinMain(
 
 int main() 
 {
-    model::Candidate candidate(10);
-    model::CNF cnf(10);
-
-    algorithm::SimulatedAnnealing sa(cnf, candidate);
-
-    const auto result = sa.Execute(
-        100,
-        100.0f,
-        1.0f,
-        0.5f,
-        utils::cooling_type::kExponential
-    );
-
-    std::cout << "temperatures:\n";
-    for (const auto& temp : result.temperatures_)
-        std::cout << temp << ' ';
-
-    std::cout << "\nenergies:\n";
-    for (const auto& energy : result.best_energies_)
-        std::cout << energy << ' ';
-
-    std::cout << '\n' << result.iterations_ << " " << result.duration_ << " " << result.solution_ << '\n';
-
     return wWinMain(
         GetModuleHandle(nullptr),
         nullptr,
