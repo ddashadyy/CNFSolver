@@ -56,9 +56,6 @@ int WINAPI wWinMain(
 }
 
 
-// testing
-
-#include <Algorithms/SimulatedAnnealing.hpp>
 
 int main() 
 {
