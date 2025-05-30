@@ -35,6 +35,8 @@ const utils::SAExecutionResult algorithm::SimulatedAnnealing::Execute(
     std::vector<double> energies{};
     std::vector<double> temperatures{};
 
+    std::string algorithmResult{"The closest solution "};
+
     for (std::uint32_t i = 0; i < kIterations; i++)
     {
         auto currentEnergy = bestEnergy;
@@ -72,7 +74,11 @@ const utils::SAExecutionResult algorithm::SimulatedAnnealing::Execute(
         }
 
         
-        if (utils::DoubleLessOrEqual(currentTemperature, kMinimalTemperature)) break;
+        if (utils::DoubleLessOrEqual(currentTemperature, kMinimalTemperature)) 
+        {
+            algorithmResult = "Init temp reaches minimal.\n The closest solution: ";
+            break;
+        }
         
         energies.emplace_back(bestEnergy);
         temperatures.emplace_back(currentTemperature);
@@ -88,7 +94,7 @@ const utils::SAExecutionResult algorithm::SimulatedAnnealing::Execute(
         kIterations,
         energies,
         temperatures,
-        std::string{"The closest solution "} + bestSolution.GetFunction(),
+        algorithmResult + bestSolution.GetFunction(),
         static_cast<std::uint32_t>(kDuration)
     };
 }
@@ -135,9 +141,8 @@ bool SimulatedAnnealing::AcceptSolution(const double kCurrentEnergy, const doubl
     std::uniform_real_distribution<double> prob_dist(0.0, 1.0);
     return utils::DoubleLess(prob_dist(rng), kPropability);
 }
-} // namespace algorithm
 
-double algorithm::SimulatedAnnealing::Cool(
+double SimulatedAnnealing::Cool(
     const double kCurrentTemperature,
     const double kCoolingRate,
     utils::cooling_type ct
@@ -155,3 +160,8 @@ double algorithm::SimulatedAnnealing::Cool(
         return 0.0;
     }
 }
+
+
+} // namespace algorithm
+
+
