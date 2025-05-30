@@ -1,15 +1,18 @@
 #include <UI/GAWindow.hpp>
-// #include "UI/GraphWindow.hpp"
+#include <UI/GraphWindow.hpp>
 
 #include <Core/CNF.hpp>
 #include <Core/Candidates.hpp>
 
 #include <tchar.h>
 #include <locale.h>
-
 #include <commctrl.h>
+#include <commdlg.h>
+
 #include <stdexcept>
 #include <string>
+#include <fstream>
+#include <sstream>
 
 namespace ui
 {
@@ -25,14 +28,22 @@ bool GAWindow::RegisterGAClass(HINSTANCE hInstance)
     wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     wc.lpszClassName = WINDOW_CLASS;
 
-    return RegisterClassEx(&wc) != 0;
+    if (!RegisterClassEx(&wc)) 
+    {
+        DWORD error = GetLastError();
+        if (error != ERROR_CLASS_ALREADY_EXISTS) 
+        {  
+            MessageBox(nullptr, L"Failed to register GAWindow class!", L"Error", MB_ICONERROR);
+            return false;
+        }
+    }
+    return true;
 }
 
 HWND GAWindow::Create(HWND parentWindow, HINSTANCE hInstance) 
 {
     if (!RegisterGAClass(hInstance))
     {
-        // Более информативное сообщение об ошибке
         DWORD err = GetLastError();
         std::wstring errMsg = L"Error code: " + std::to_wstring(err);
         MessageBox(NULL, errMsg.c_str(), L"Registration Error", MB_ICONERROR);
@@ -40,11 +51,11 @@ HWND GAWindow::Create(HWND parentWindow, HINSTANCE hInstance)
     }
 
     HWND hGAWnd = CreateWindowEx(
-        WS_EX_APPWINDOW, // Делаем окно независимым
+        WS_EX_APPWINDOW, 
         WINDOW_CLASS,
         L"Генетический алгоритм",
         WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-        CW_USEDEFAULT, CW_USEDEFAULT, 600, 400,
+        CW_USEDEFAULT, CW_USEDEFAULT, 600, 500,
         parentWindow, 
         NULL, 
         hInstance, 
@@ -77,6 +88,10 @@ LRESULT CALLBACK GAWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
             OnCommand(hWnd, LOWORD(wParam));
             return 0;
             
+        case WM_CLOSE:
+            DestroyWindow(hWnd);
+            return 0;
+
         case WM_DESTROY:
             OnDestroy(hWnd);
             return 0;
@@ -159,8 +174,16 @@ void GAWindow::CreateControls(HWND hWnd)
                     20, 280, 180, 30, hWnd, (HMENU)IDC_GENERATE_CNF_BTN, NULL, NULL);
 
     CreateWindowW(L"BUTTON", L"Сгенерировать кандидатов",
-                                                WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
-                                                220, 280, 180, 30, hWnd, (HMENU)IDC_GENERATE_CANDIDATES_BTN, NULL, NULL);
+                    WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
+                    220, 280, 180, 30, hWnd, (HMENU)IDC_GENERATE_CANDIDATES_BTN, NULL, NULL);
+
+    CreateWindowW(L"BUTTON", L"Загрузить КНФ из файла",
+                    WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
+                    20, 360, 180, 30, hWnd, (HMENU)IDC_LOAD_CNF_BTN, NULL, NULL);
+
+    CreateWindowW(L"BUTTON", L"Загрузить кандидатов из файла",
+                    WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
+                    220, 360, 180, 30, hWnd, (HMENU)IDC_LOAD_CANDIDATES_BTN, NULL, NULL);
 
     CreateWindowW(L"BUTTON", L"Выполнить алгоритм",
                     WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
@@ -212,6 +235,24 @@ void GAWindow::OnCommand(HWND hWnd, int controlId)
             MessageBoxW(hWnd, L"Candidates generated successfully", L"Success", MB_OK);
             break;
         }
+
+        case IDC_LOAD_CNF_BTN: 
+        {
+            std::wstring filePath = OpenFileDialog(hWnd, L"Text document\0*.txt\0All Files\0*.*\0");
+            if (!filePath.empty()) 
+                LoadCNFFromFile(hWnd, filePath);
+            
+            break;
+        }
+
+        case IDC_LOAD_CANDIDATES_BTN: 
+        {
+            std::wstring filePath = OpenFileDialog(hWnd, L"Text document\0*.txt\0All Files\0*.*\0");
+            if (!filePath.empty()) 
+                LoadCandidatesFromFile(hWnd, filePath);
+            
+            break;
+        }
         
         case IDC_RUN_BTN:
             RunAlgorithm(hWnd);
@@ -249,13 +290,33 @@ void GAWindow::RunAlgorithm(HWND hWnd)
             static_cast<utils::selection_function>(selectionMethod)
         );
         
-        // Show results
         std::wstring message = L"Algorithm completed!\n";
         message += L"Iterations: " + std::to_wstring(result.iterations_) + L"\n";
         message += L"Solution: " + std::wstring(result.solution_.begin(), result.solution_.end()) + L"\n";
         message += L"Execution time in milliseconds: " + std::to_wstring(result.duration_);
         
         MessageBoxW(hWnd, message.c_str(), L"Results", MB_OK);
+
+
+        HINSTANCE hInstance = reinterpret_cast<HINSTANCE>(GetWindowLongPtr(hWnd, GWLP_HINSTANCE));
+        if (!hInstance) 
+        {
+            MessageBoxW(hWnd, L"Invalid hInstance", L"Error", MB_ICONERROR);
+            return;
+        }
+
+
+        HWND hGraphWnd = GraphWindow::Create(
+            hWnd, 
+            hInstance,
+            result.best_qualities_,
+            L"Genetic Algorithm Quality Progress"
+        );
+
+        if (!hGraphWnd) 
+            MessageBoxW(hWnd, L"Failed to create graph window", L"Error", MB_ICONERROR);
+        
+
     } 
 
     catch (const std::exception& e) 
@@ -274,6 +335,102 @@ void GAWindow::OnDestroy(HWND hWnd)
 
     delete currentAlgorithm;
     currentAlgorithm = nullptr;
+
+    DestroyWindow(hWnd);
+}
+
+bool GAWindow::LoadCNFFromFile(HWND hWnd, const std::wstring& filePath) 
+{
+    try 
+    {
+        std::ifstream file(filePath.c_str());
+        if (!file.is_open()) 
+        {
+            MessageBoxW(hWnd, L"Не удалось открыть файл", L"Ошибка", MB_ICONERROR);
+            return false;
+        }
+
+        if (currentCNF != nullptr) 
+        {
+            delete currentCNF;
+            currentCNF = nullptr;
+        }
+
+        std::string fileCNF{};
+        file >> fileCNF;
+        currentCNF = new model::CNF(std::move(fileCNF));
+        
+        file.close();
+
+        MessageBoxW(hWnd, L"КНФ успешно загружена", L"Успех", MB_OK);
+        return true;
+    }
+    catch (const std::exception& e) 
+    {
+        MessageBoxA(hWnd, e.what(), "Ошибка", MB_ICONERROR);
+        return false;
+    }
+}
+
+bool GAWindow::LoadCandidatesFromFile(HWND hWnd, const std::wstring& filePath) 
+{
+    try 
+    {
+        std::ifstream file(filePath.c_str());
+        if (!file.is_open()) 
+        {
+            MessageBoxW(hWnd, L"Не удалось открыть файл", L"Ошибка", MB_ICONERROR);
+            return false;
+        }
+
+        if (currentCandidates != nullptr) 
+        {
+            delete currentCandidates;
+            currentCandidates = nullptr;
+        }
+
+        std::vector<model::Candidate> fileCandidates{};
+        std::stringstream buffer;
+
+        buffer << file.rdbuf();
+        std::string line;
+
+        while (std::getline(buffer, line)) 
+        {
+            fileCandidates.emplace_back(line);
+        }
+
+        currentCandidates = new model::Candidates(std::move(fileCandidates));
+        
+        file.close();
+
+        MessageBoxW(hWnd, L"Кандидаты успешно загружены", L"Успех", MB_OK);
+        return true;
+    }
+    catch (const std::exception& e) {
+        MessageBoxA(hWnd, e.what(), "Ошибка", MB_ICONERROR);
+        return false;
+    }
+}
+
+std::wstring GAWindow::OpenFileDialog(HWND hWnd, const wchar_t* filter) 
+{
+    OPENFILENAMEW ofn;
+    wchar_t fileName[MAX_PATH] = {0};
+
+    ZeroMemory(&ofn, sizeof(ofn));
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = hWnd;
+    ofn.lpstrFile = fileName;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.lpstrFilter = filter;
+    ofn.nFilterIndex = 1;
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+    if (GetOpenFileNameW(&ofn)) 
+        return fileName;
+    
+    return L"";
 }
 
 } // namespace ui

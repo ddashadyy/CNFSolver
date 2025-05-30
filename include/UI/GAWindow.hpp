@@ -32,6 +32,8 @@ private:
         IDC_SELECTION_COMBO,
         IDC_GENERATE_CNF_BTN,
         IDC_GENERATE_CANDIDATES_BTN,
+        IDC_LOAD_CNF_BTN,          
+        IDC_LOAD_CANDIDATES_BTN,   
         IDC_RUN_BTN
     };
 
@@ -43,6 +45,11 @@ private:
     // Helper methods
     static void CreateControls(HWND hWnd);
     static void RunAlgorithm(HWND hWnd);
+
+    // File operations
+    static bool LoadCNFFromFile(HWND hWnd, const std::wstring& filePath);
+    static bool LoadCandidatesFromFile(HWND hWnd, const std::wstring& filePath);
+    static std::wstring OpenFileDialog(HWND hWnd, const wchar_t* filter);
     
     // Instance data
     static inline model::CNF* currentCNF = nullptr;
