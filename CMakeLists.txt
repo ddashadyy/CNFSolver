@@ -20,13 +20,15 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -st
 
 add_executable(${PROJECT_NAME} WIN32 src/main.cpp)
 
-# Объектные библиотеки
 add_library(${PROJECT_NAME}_objs OBJECT
     src/Algorithms/GeneticAlgorithm.cpp
     src/Algorithms/SimulatedAnnealing.cpp
+    
     src/Core/CNF.cpp
     src/Core/Candidate.cpp
     src/Core/Candidates.cpp
+
+    src/Utils/Utils.cpp
 )
 
 add_library(${PROJECT_NAME}_wnd_objs OBJECT
