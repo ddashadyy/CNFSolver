@@ -17,7 +17,7 @@ public:
 
     virtual ~AlgorithmBase() = default;
 
-    virtual ExecutionResul Execute( const Args... args ) = 0;
+    virtual const ExecutionResul Execute( const Args... args ) = 0;
 
 
 protected:
