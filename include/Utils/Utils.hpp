@@ -19,4 +19,11 @@ struct GAExecutionResult
     std::uint32_t duration_;
 };
 
+struct GraphData
+{
+    std::vector<double> data_;
+    std::wstring title_;
+};
+
+
 } // namespace utils
