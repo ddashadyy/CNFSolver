@@ -19,6 +19,18 @@ struct GAExecutionResult
     std::uint32_t duration_;
 };
 
+struct SAExecutionResult
+{
+    std::uint32_t iterations_;
+    
+    std::vector<double> best_energies_;
+    std::vector<double> temperatures_;
+
+    std::string solution_;
+
+    std::uint32_t duration_;
+};
+
 struct GraphData
 {
     std::vector<double> data_;
