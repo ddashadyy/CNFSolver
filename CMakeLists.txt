@@ -33,8 +33,7 @@ add_library(${PROJECT_NAME}_wnd_objs OBJECT
     src/UI/MainWindow.cpp
     src/UI/GAWindow.cpp
     # src/UI/SAWindow.cpp
-    # src/UI/GraphWindow.cpp
-    # src/UI/Utils.cpp
+    src/UI/GraphWindow.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE include)
