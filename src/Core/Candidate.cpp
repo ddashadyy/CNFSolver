@@ -15,7 +15,6 @@ Candidate::Candidate(const std::uint32_t kFunctionLength) : quality_(0.0)
 
     if (candidate_out.is_open())
         candidate_out << this->function_;
-    
 
     candidate_out.close();
 }
@@ -59,12 +58,9 @@ void Candidate::EvaluateQualityFunction(const CNF& kCNF)
 
 std::string Candidate::GenerateRandomBooleanFunction(const std::uint32_t kLength) const
 {
-    if (kLength == 0 || kLength > 64)
-        throw std::invalid_argument("Function length must be between 1 and 64");
-
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::bernoulli_distribution distrib(0.5); // 50% chance for 0 or 1
+    std::bernoulli_distribution distrib(0.5); 
 
     std::string function;
     function.resize(kLength);
