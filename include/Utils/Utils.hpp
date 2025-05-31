@@ -4,6 +4,7 @@
 #include <string>
 #include <limits>
 
+
 namespace utils
 {
 
@@ -13,6 +14,7 @@ constexpr double EPSILON = std::numeric_limits<double>::epsilon() * 10;
 struct GAExecutionResult final
 {
     std::uint32_t iterations_; 
+
     std::vector<double> best_qualities_; 
     std::string solution_;
 
@@ -26,6 +28,16 @@ struct SAExecutionResult final
     std::vector<double> best_energies_;
     std::vector<double> temperatures_;
 
+    std::string solution_;
+
+    std::uint32_t duration_;
+};
+
+struct BHExecutionResult final
+{
+    std::uint32_t iterations_;
+
+    std::vector<double> best_qualities_;
     std::string solution_;
 
     std::uint32_t duration_;
