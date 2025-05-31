@@ -194,7 +194,7 @@ void GeneticAlgorithm::DoSelection(
 )
 {
     std::sort(candidates.begin(), candidates.end(), [](const model::Candidate &lhs, const model::Candidate &rhs)
-              { return lhs.GetQuality() < rhs.GetQuality(); });
+              { return lhs.GetQuality() > rhs.GetQuality(); });
 
     candidates.resize(kPopulation);
 }
