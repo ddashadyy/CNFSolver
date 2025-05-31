@@ -3,9 +3,6 @@ cmake_minimum_required(VERSION 3.13)
 project(cnf-solver
     LANGUAGES CXX)
 
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 add_compile_definitions(UNICODE _UNICODE WIN32_LEAN_AND_MEAN)
 
@@ -23,6 +20,7 @@ add_executable(${PROJECT_NAME} WIN32 src/main.cpp)
 add_library(${PROJECT_NAME}_objs OBJECT
     src/Algorithms/GeneticAlgorithm.cpp
     src/Algorithms/SimulatedAnnealing.cpp
+    src/Algorithms/BeeHive.cpp
     
     src/Core/CNF.cpp
     src/Core/Candidate.cpp
