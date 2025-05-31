@@ -14,12 +14,12 @@ namespace algorithm
 BeeHive::BeeHive(
     const model::CNF& kCNF, 
     const model::Candidates& kCandidates
-) : AlgorithmBase(kCNF), candidates_(kCandidates) {}
+) : AlgorithmBase(kCNF), candidates_(std::make_unique<model::Candidates>(kCandidates)) {}
 
 BeeHive::BeeHive(
     model::CNF&& kCNF, 
     model::Candidates&& kCandidates
-) noexcept : AlgorithmBase(std::move(kCNF)), candidates_(std::move(kCandidates)) {}
+) noexcept : AlgorithmBase(std::move(kCNF)), candidates_(std::make_unique<model::Candidates>(std::move(kCandidates))) {}
 
 
 
@@ -34,7 +34,7 @@ const utils::BHExecutionResult BeeHive::Execute(
 {
     const auto kStartTime = std::chrono::high_resolution_clock::now();
 
-    auto& candidates = this->candidates_.GetCandidates();
+    auto& candidates = candidates_->GetCandidates();
 
     std::vector<double> best_qualities;
 
@@ -42,7 +42,7 @@ const utils::BHExecutionResult BeeHive::Execute(
     {
         for (auto& candidate : candidates)
         {
-            candidate.EvaluateQualityFunction(this->cnf_);
+            candidate.EvaluateQualityFunction(*cnf_);
             if (utils::DoubleEqual(candidate.GetQuality(), 1.0))
             {
                 const auto kEndTime = std::chrono::high_resolution_clock::now();
@@ -161,7 +161,7 @@ std::vector<double> BeeHive::ForagerBeePhase(
 
     for (auto& candidate : candidates)
     {
-        candidate.EvaluateQualityFunction(this->cnf_);
+        candidate.EvaluateQualityFunction(*cnf_);
         totalQuality += candidate.GetQuality();
     }
 
@@ -213,7 +213,7 @@ void BeeHive::LocalSearchSolutions(
 
         Mutate(candidate, sf);
 
-        candidate.EvaluateQualityFunction(cnf_);
+        candidate.EvaluateQualityFunction(*cnf_);
         const double kMutatedCandidateQuality = candidate.GetQuality();
 
         if (utils::DoubleLess(kMutatedCandidateQuality, kCurrentSolutionQuality))
@@ -242,7 +242,7 @@ void BeeHive::RestorePopulation(
 
     candidates.reserve(kTargetPopulation);
     while (candidates.size() < kTargetPopulation) 
-        candidates.emplace_back(this->candidates_.GetCandidates().front().GetFunction().length());
+        candidates.emplace_back(candidates_->GetCandidates().front().GetFunction().length());
 }
 
 

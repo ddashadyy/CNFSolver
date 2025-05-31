@@ -10,11 +10,11 @@ namespace algorithm
 
 algorithm::SimulatedAnnealing::SimulatedAnnealing(
     const model::CNF& kCNF, const model::Candidate& kCandidate
-) : AlgorithmBase(kCNF), candidate_(kCandidate) {}
+) : AlgorithmBase(kCNF), candidate_(std::make_unique<model::Candidate>(kCandidate)) {}
 
 algorithm::SimulatedAnnealing::SimulatedAnnealing(
     model::CNF&& kCNF, model::Candidate&& kCandidate
-) noexcept : AlgorithmBase(std::move(kCNF)), candidate_(std::move(kCandidate)) {}
+) noexcept : AlgorithmBase(std::move(kCNF)), candidate_(std::make_unique<model::Candidate>(std::move(kCandidate))) {}
 
 
 const utils::SAExecutionResult algorithm::SimulatedAnnealing::Execute(
@@ -29,8 +29,8 @@ const utils::SAExecutionResult algorithm::SimulatedAnnealing::Execute(
 
     double currentTemperature = kInitialTemperature;
 
-    model::Candidate bestSolution{this->candidate_};
-    double bestEnergy = EvaluateEnergy(this->candidate_);
+    model::Candidate bestSolution{*candidate_};
+    double bestEnergy = EvaluateEnergy(*candidate_);
 
     std::vector<double> energies{};
     std::vector<double> temperatures{};
@@ -53,7 +53,7 @@ const utils::SAExecutionResult algorithm::SimulatedAnnealing::Execute(
                 i,
                 energies,
                 temperatures,
-                this->candidate_.GetFunction(),
+                candidate_->GetFunction(),
                 static_cast<std::uint32_t>(kDuration)
             };
         }
@@ -63,13 +63,13 @@ const utils::SAExecutionResult algorithm::SimulatedAnnealing::Execute(
 
         if (AcceptSolution(currentEnergy, newEnergy, currentTemperature))
         {
-            this->candidate_ = std::move(newCandidate);
+            candidate_ = std::make_unique<model::Candidate>(std::move(newCandidate));
             currentEnergy = newEnergy;
         }
 
         if (utils::DoubleLess(currentEnergy, bestEnergy))
         {
-            bestSolution = this->candidate_;
+            bestSolution = *candidate_;
             bestEnergy = currentEnergy;            
         }
 
@@ -102,13 +102,13 @@ const utils::SAExecutionResult algorithm::SimulatedAnnealing::Execute(
 
 double algorithm::SimulatedAnnealing::EvaluateEnergy(model::Candidate& candidate)
 {
-    candidate.EvaluateQualityFunction(this->cnf_);
+    candidate.EvaluateQualityFunction(*cnf_);
     return 1.0 - candidate.GetQuality();
 }
 
 model::Candidate SimulatedAnnealing::GetCandidateNeighbor(const double kCoolingRate)
 {
-    model::Candidate candidate{this->candidate_};
+    model::Candidate candidate{*candidate_};
 
     static std::random_device rd;
     static std::mt19937 gen(rd());

@@ -83,9 +83,7 @@ private:
     );
 
     
-
-    model::Candidates candidates_;
-
+    std::unique_ptr<model::Candidates> candidates_;
 };
 
 

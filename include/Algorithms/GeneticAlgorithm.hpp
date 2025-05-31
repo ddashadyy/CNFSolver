@@ -64,7 +64,8 @@ private:
         const std::uint32_t kPopulation
     );
 
-    model::Candidates candidates_;
+    
+    std::unique_ptr<model::Candidates> candidates_;
 };
 
 } // namespace algorithm

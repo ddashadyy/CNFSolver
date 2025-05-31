@@ -60,7 +60,8 @@ private:
         utils::cooling_type ct
     ) const;
 
-    model::Candidate candidate_;
+    
+    std::unique_ptr<model::Candidate> candidate_;
 };
 
 

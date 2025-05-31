@@ -12,12 +12,12 @@ namespace algorithm
 GeneticAlgorithm::GeneticAlgorithm(
     const model::CNF& kCNF,
     const model::Candidates& kCandidates
-) : AlgorithmBase(kCNF), candidates_(kCandidates) {}
+) : AlgorithmBase(kCNF), candidates_(std::make_unique<model::Candidates>(kCandidates)) {}
 
 GeneticAlgorithm::GeneticAlgorithm(
     model::CNF&& cnf, 
     model::Candidates&& candidates
-) noexcept : AlgorithmBase(std::move(cnf)), candidates_(candidates) {}
+) noexcept : AlgorithmBase(std::move(cnf)), candidates_(std::make_unique<model::Candidates>(std::move(candidates))) {}
 
 const utils::GAExecutionResult GeneticAlgorithm::Execute(
     const std::uint32_t kIterations, 
@@ -30,7 +30,7 @@ const utils::GAExecutionResult GeneticAlgorithm::Execute(
 {
     const auto kStartTime = std::chrono::high_resolution_clock::now();
 
-    auto& candidates = this->candidates_.GetCandidates();
+    auto& candidates = candidates_->GetCandidates();
 
     std::vector<double> best_qualities;
 
@@ -38,7 +38,7 @@ const utils::GAExecutionResult GeneticAlgorithm::Execute(
     {
         for (auto& candidate : candidates)
         {
-            candidate.EvaluateQualityFunction(this->cnf_);
+            candidate.EvaluateQualityFunction(*cnf_);
             if (utils::DoubleEqual(candidate.GetQuality(), 1.0))
             {
 

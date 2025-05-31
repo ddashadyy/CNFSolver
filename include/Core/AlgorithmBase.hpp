@@ -3,6 +3,8 @@
 
 #include <Core/CNF.hpp>
 
+#include <memory>
+
 namespace algorithm
 {
 
@@ -21,15 +23,15 @@ public:
 
 
 protected:
-    model::CNF cnf_;
+    std::unique_ptr<model::CNF> cnf_;
 };
 
 template< class ExecutionResul, class... Args >
 AlgorithmBase<ExecutionResul, Args...>::AlgorithmBase(const model::CNF& kCNF) 
-    : cnf_(kCNF) {}
+    : cnf_(std::make_unique<model::CNF>(kCNF)) {}
 
 template< class ExecutionResul, class... Args >
 AlgorithmBase<ExecutionResul, Args...>::AlgorithmBase(model::CNF&& cnf) noexcept
-    : cnf_(std::move(cnf)) {}
+    : cnf_(std::make_unique<model::CNF>(std::move(cnf))) {}
     
 } // namespace algorithm
