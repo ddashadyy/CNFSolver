@@ -37,6 +37,8 @@ const utils::BHExecutionResult BeeHive::Execute(
     auto& candidates = candidates_->GetCandidates();
 
     std::vector<double> best_qualities;
+    std::vector<double> best_progressive_qualities;
+    double current_best_quality = 0.0; 
 
     for (std::uint32_t i = 0; i < kIterations; i++)
     {
@@ -50,9 +52,13 @@ const utils::BHExecutionResult BeeHive::Execute(
 
                 best_qualities.emplace_back(1.0);
 
+                if (utils::DoubleGreater(1.0, current_best_quality)) 
+                    best_progressive_qualities.emplace_back(1.0);
+
                 return utils::BHExecutionResult{
                     i, 
                     best_qualities,
+                    best_progressive_qualities,
                     candidate.GetFunction(),
                     static_cast<std::uint32_t>(kDuration)
                 };
@@ -66,8 +72,17 @@ const utils::BHExecutionResult BeeHive::Execute(
         LocalSearchSolutions(candidates, sf);
         AbandonWorstSolutions(candidates);
 
-        best_qualities.emplace_back(candidates.front().GetQuality());
+        
+        double iteration_best = candidates.front().GetQuality();
+        best_qualities.emplace_back(iteration_best);
+
         RestorePopulation(kPopulation, candidates);
+        
+        if (utils::DoubleGreater(iteration_best, current_best_quality)) 
+        {
+            best_progressive_qualities.emplace_back(iteration_best);
+            current_best_quality = iteration_best;
+        }
         
     }
 
@@ -76,12 +91,12 @@ const utils::BHExecutionResult BeeHive::Execute(
 
     return utils::BHExecutionResult{
         kIterations, 
-        best_qualities, 
+        best_qualities,
+        best_progressive_qualities,
         std::string{"Not enough iterations.\nPropably there is no solution."},
         static_cast<std::uint32_t>(kDuration)
     };
 }
-
 
 
 void BeeHive::ScoutBeePhase(

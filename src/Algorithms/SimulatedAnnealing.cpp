@@ -34,6 +34,8 @@ const utils::SAExecutionResult algorithm::SimulatedAnnealing::Execute(
 
     std::vector<double> energies{};
     std::vector<double> temperatures{};
+    std::vector<double> best_progressive_qualities;
+    double current_best_quality = 0.0;
 
     std::string algorithmResult{"The closest solution "};
 
@@ -49,10 +51,14 @@ const utils::SAExecutionResult algorithm::SimulatedAnnealing::Execute(
             energies.emplace_back(currentEnergy);
             temperatures.emplace_back(currentTemperature);
 
+            if (utils::DoubleGreater(1.0, current_best_quality)) 
+                best_progressive_qualities.emplace_back(1.0);
+
             return utils::SAExecutionResult{
                 i,
                 energies,
                 temperatures,
+                best_progressive_qualities,
                 candidate_->GetFunction(),
                 static_cast<std::uint32_t>(kDuration)
             };
@@ -85,6 +91,14 @@ const utils::SAExecutionResult algorithm::SimulatedAnnealing::Execute(
 
         currentTemperature = Cool(currentTemperature, kCoolingRate, ct);
 
+        double iteration_best = candidate_->GetQuality();
+        
+        if (utils::DoubleGreater(iteration_best, current_best_quality)) 
+        {
+            best_progressive_qualities.emplace_back(iteration_best);
+            current_best_quality = iteration_best;
+        }
+
     }
 
     const auto kEndTime = std::chrono::high_resolution_clock::now();
@@ -94,6 +108,7 @@ const utils::SAExecutionResult algorithm::SimulatedAnnealing::Execute(
         kIterations,
         energies,
         temperatures,
+        best_progressive_qualities,
         algorithmResult + bestSolution.GetFunction(),
         static_cast<std::uint32_t>(kDuration)
     };

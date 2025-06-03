@@ -19,6 +19,7 @@ GeneticAlgorithm::GeneticAlgorithm(
     model::Candidates&& candidates
 ) noexcept : AlgorithmBase(std::move(cnf)), candidates_(std::make_unique<model::Candidates>(std::move(candidates))) {}
 
+
 const utils::GAExecutionResult GeneticAlgorithm::Execute(
     const std::uint32_t kIterations, 
     const std::uint32_t kPopulation, 
@@ -33,6 +34,8 @@ const utils::GAExecutionResult GeneticAlgorithm::Execute(
     auto& candidates = candidates_->GetCandidates();
 
     std::vector<double> best_qualities;
+    std::vector<double> best_progressive_qualities;
+    double current_best_quality = 0.0; 
 
     for (std::uint32_t i = 0; i < kIterations; i++)
     {
@@ -41,15 +44,19 @@ const utils::GAExecutionResult GeneticAlgorithm::Execute(
             candidate.EvaluateQualityFunction(*cnf_);
             if (utils::DoubleEqual(candidate.GetQuality(), 1.0))
             {
-
                 const auto kEndTime = std::chrono::high_resolution_clock::now();
                 const auto kDuration = std::chrono::duration_cast<std::chrono::milliseconds>(kEndTime - kStartTime).count();
 
                 best_qualities.emplace_back(1.0);
+                
+                if (utils::DoubleGreater(1.0, current_best_quality)) 
+                    best_progressive_qualities.emplace_back(1.0);
+                
 
                 return utils::GAExecutionResult{
                         i,
                         best_qualities,
+                        best_progressive_qualities, 
                         candidate.GetFunction(),
                         static_cast<std::uint32_t>(kDuration)
                     };
@@ -60,7 +67,15 @@ const utils::GAExecutionResult GeneticAlgorithm::Execute(
         Mutate(candidates, kPopulation, kMutations, kAmountGensMutation, sf);
         DoSelection(candidates, kPopulation);
 
-        best_qualities.emplace_back(candidates.front().GetQuality());
+        double iteration_best = candidates.front().GetQuality();
+        best_qualities.emplace_back(iteration_best);
+
+        
+        if (utils::DoubleGreater(iteration_best, current_best_quality)) 
+        {
+            best_progressive_qualities.emplace_back(iteration_best);
+            current_best_quality = iteration_best;
+        }
     }
 
     const auto kEndTime = std::chrono::high_resolution_clock::now();
@@ -68,7 +83,8 @@ const utils::GAExecutionResult GeneticAlgorithm::Execute(
 
     return utils::GAExecutionResult{
         kIterations, 
-        best_qualities, 
+        best_qualities,
+        best_progressive_qualities, 
         std::string{"Not enough iterations.\nPropably there is no solution."},
         static_cast<std::uint32_t>(kDuration)
     };
