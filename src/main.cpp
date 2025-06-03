@@ -12,18 +12,17 @@
 
 int WINAPI wWinMain(
     _In_ HINSTANCE hInstance,
-    _In_opt_ HINSTANCE hPrevInstance,
-    _In_ LPWSTR lpCmdLine,
+    [[maybe_unused]] _In_opt_ HINSTANCE hPrevInstance,
+    [[maybe_unused]] _In_ LPWSTR lpCmdLine,
     _In_ int nCmdShow
 )
 {
-    (void)hPrevInstance;
-    (void)lpCmdLine;
-
     try 
     {
-        INITCOMMONCONTROLSEX icc = { sizeof(INITCOMMONCONTROLSEX) };
-        icc.dwICC = ICC_STANDARD_CLASSES | ICC_WIN95_CLASSES;
+        INITCOMMONCONTROLSEX icc = { 
+            sizeof(INITCOMMONCONTROLSEX),
+            ICC_STANDARD_CLASSES | ICC_WIN95_CLASSES
+        };
         InitCommonControlsEx(&icc);
 
         if (!ui::MainWindow::RegisterMWClass(hInstance)) 
@@ -55,33 +54,8 @@ int WINAPI wWinMain(
     }
 }
 
-#include <Algorithms/BeeHive.hpp>
-
 int main() 
 {
-    // model::CNF* cnf = new model::CNF(10);
-    // model::Candidates* candidates = new model::Candidates(10, 10);
-
-    // algorithm::BeeHive* bh = new algorithm::BeeHive(*cnf, *candidates);
-
-    // const auto result = bh->Execute(
-    //     1000,
-    //     10,
-    //     5,
-    //     5,
-    //     5,
-    //     utils::selection_function::kRandom
-    // );
-
-    // std::cout << "Iterations: " << result.iterations_ 
-    //           << " duration: " << result.duration_ 
-    //           << " solution: " << result.solution_ << '\n';
-
-    // std::cout << "best qualities\n";
-    // for (const auto& bq : result.best_qualities_)
-    //     std::cout << bq << " ";
-    // std::cout << '\n';
-
     return wWinMain(
         GetModuleHandle(nullptr),
         nullptr,
