@@ -22,11 +22,20 @@ public:
         const std::wstring& title
     );
 
-    static constexpr wchar_t* WindowClass = L"CNF_Solver_GraphWindow";
+    static HWND Create(
+        HWND parentWindow, 
+        HINSTANCE hInstance, 
+        const std::vector<double>& data, 
+        const double yMax,
+        const std::wstring& title
+    );
+
+    static constexpr const wchar_t* WindowClass = L"CNF_Solver_GraphWindow";
 
 private:
     static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     static void OnPaint(HWND hWnd, const std::vector<double>& data, const std::wstring& title);
+    static void OnPaint(HWND hWnd, const std::vector<double>& data, const std::wstring& title, const double xMax);
     
     static inline utils::GraphData* currentGraphData = nullptr;
 };

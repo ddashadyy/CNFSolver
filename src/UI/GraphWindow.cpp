@@ -4,6 +4,7 @@
 #include <algorithm>
 
 
+
 namespace ui 
 {
 
@@ -12,13 +13,20 @@ bool GraphWindow::RegisterGWClass(HINSTANCE hInstance)
     static bool isRegistered = false; 
     if (isRegistered) return true;    
 
-    WNDCLASSEX wc = { sizeof(WNDCLASSEX) };
-    wc.style = CS_HREDRAW | CS_VREDRAW;
-    wc.lpfnWndProc = WindowProc;
-    wc.hInstance = hInstance;
-    wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wc.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
-    wc.lpszClassName = WindowClass;
+    WNDCLASSEXW wc = { 
+        sizeof(WNDCLASSEXW),
+        CS_HREDRAW | CS_VREDRAW,              
+        WindowProc,          
+        0,                   
+        0,                   
+        hInstance,          
+        nullptr,        
+        LoadCursor(nullptr, IDC_ARROW),          
+        reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1),                
+        nullptr,               
+        WindowClass,             
+        nullptr    
+    };
 
     isRegistered = RegisterClassEx(&wc) != 0;
     return isRegistered;
@@ -33,12 +41,49 @@ HWND GraphWindow::Create(
 {
     if (!RegisterGWClass(hInstance)) 
     {
-        DWORD err = GetLastError();
         MessageBoxW(nullptr, L"Failed to register class", L"Error", MB_ICONERROR);
         return nullptr;
     }
 
-    currentGraphData = new utils::GraphData{data, title};
+    currentGraphData = new utils::GraphData{data, title, 0.0};
+    HWND hWnd = CreateWindowEx(
+        0,
+        WindowClass,
+        title.c_str(),
+        WS_OVERLAPPEDWINDOW,
+        100, 100, 800, 600,
+        parentWindow,  
+        nullptr,
+        hInstance,
+        currentGraphData
+    );
+
+    if (!hWnd) 
+    {
+        delete currentGraphData;
+        return nullptr;
+    }
+
+    ShowWindow(hWnd, SW_SHOW);
+    UpdateWindow(hWnd);
+    return hWnd;
+}
+
+HWND ui::GraphWindow::Create(
+    HWND parentWindow, 
+    HINSTANCE hInstance, 
+    const std::vector<double>& data, 
+    const double yMax,
+    const std::wstring &title
+)
+{
+    if (!RegisterGWClass(hInstance)) 
+    {
+        MessageBoxW(nullptr, L"Failed to register class", L"Error", MB_ICONERROR);
+        return nullptr;
+    }
+
+    currentGraphData = new utils::GraphData{data, title, yMax};
     HWND hWnd = CreateWindowEx(
         0,
         WindowClass,
@@ -77,8 +122,10 @@ LRESULT CALLBACK GraphWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
     switch (uMsg) 
     {
         case WM_PAINT:
-            if (currentGraphData) 
+            if (utils::DoubleEqual(currentGraphData->y_max_, 0.0)) 
                 OnPaint(hWnd, currentGraphData->data_, currentGraphData->title_);
+            else 
+                OnPaint(hWnd, currentGraphData->data_, currentGraphData->title_, currentGraphData->y_max_);
             
             return 0;
             
@@ -206,6 +253,111 @@ void GraphWindow::OnPaint(HWND hWnd, const std::vector<double>& data, const std:
     
     Gdiplus::GdiplusShutdown(gdiplusToken);
     
+    EndPaint(hWnd, &ps);
+}
+
+void GraphWindow::OnPaint(HWND hWnd, const std::vector<double>& yData, const std::wstring& title, const double xMax) 
+{
+    PAINTSTRUCT ps;
+    HDC hdc = BeginPaint(hWnd, &ps);
+    
+    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+    ULONG_PTR gdiplusToken;
+    Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
+    
+    {
+        Gdiplus::Graphics graphics(hdc);
+        
+        RECT rect;
+        GetClientRect(hWnd, &rect);
+        int width = rect.right - rect.left;
+        int height = rect.bottom - rect.top;
+        
+        const int margin = 50;
+        Gdiplus::RectF plotArea(
+            margin, margin, 
+            width - 2 * margin, 
+            height - 2 * margin
+        );
+        
+        Gdiplus::SolidBrush bgBrush(Gdiplus::Color(255, 255, 255));
+        graphics.FillRectangle(&bgBrush, 0, 0, width, height);
+        
+        Gdiplus::Font titleFont(L"Arial", 16);
+        Gdiplus::SolidBrush textBrush(Gdiplus::Color(0, 0, 0));
+        Gdiplus::StringFormat format;
+        format.SetAlignment(Gdiplus::StringAlignmentCenter);
+        graphics.DrawString(
+            title.c_str(), -1, &titleFont,
+            Gdiplus::PointF(width / 2.0f, 10), &format, &textBrush
+        );
+        
+        if (yData.empty()) 
+        {
+            Gdiplus::SolidBrush brush(Gdiplus::Color(255, 0, 0));
+            graphics.DrawString(L"No data to display", -1, nullptr, Gdiplus::PointF(10, 10), &brush);
+            return;
+        }
+
+        double minX = 0.0;
+        double maxX = xMax;
+
+        double minY = 0.0;
+        double maxY = 1.0; 
+
+        Gdiplus::Pen axisPen(Gdiplus::Color(0, 0, 0), 2);
+        graphics.DrawLine(&axisPen, 
+            plotArea.X, plotArea.GetBottom(), 
+            plotArea.GetRight(), plotArea.GetBottom());
+        graphics.DrawLine(&axisPen, 
+            plotArea.X, plotArea.GetBottom(), 
+            plotArea.X, plotArea.Y);
+        
+        Gdiplus::Font labelFont(L"Arial", 10);
+        for (int i = 0; i <= 10; i++) 
+        {
+            float x = plotArea.X + (i / 10.0f) * plotArea.Width;
+            double timeValue = minX + (i / 10.0) * (maxX - minX);
+            
+            graphics.DrawLine(&axisPen, x, plotArea.GetBottom(), x, plotArea.GetBottom() + 5);
+            
+            std::wstring label = std::to_wstring(static_cast<int>(timeValue));
+            graphics.DrawString(
+                label.c_str(), -1, &labelFont,
+                Gdiplus::PointF(x - 10, plotArea.GetBottom() + 10),
+                &textBrush
+            );
+        }
+        
+        for (int i = 0; i <= 10; i++) 
+        {
+            float y = plotArea.GetBottom() - (i / 10.0f) * plotArea.Height;
+            double qualityValue = minY + (i / 10.0) * (maxY - minY);
+            
+            graphics.DrawLine(&axisPen, plotArea.X - 5, y, plotArea.X, y);
+            
+            std::wstring label = std::to_wstring(qualityValue).substr(0, 4);
+            graphics.DrawString(
+                label.c_str(), -1, &labelFont,
+                Gdiplus::PointF(plotArea.X - 40, y - 8),
+                &textBrush
+            );
+        }
+        
+        Gdiplus::Pen dataPen(Gdiplus::Color(255, 0, 0), 2);
+        for (size_t i = 1; i < yData.size(); i++) 
+        {
+            float x1 = plotArea.X + ((i-1) / static_cast<float>(yData.size()-1)) * plotArea.Width;
+            float x2 = plotArea.X + (i / static_cast<float>(yData.size()-1)) * plotArea.Width;
+
+            float y1 = plotArea.GetBottom() - static_cast<float>(yData[i-1] / maxY * plotArea.Height);
+            float y2 = plotArea.GetBottom() - static_cast<float>(yData[i] / maxY * plotArea.Height);
+            
+            graphics.DrawLine(&dataPen, x1, y1, x2, y2);
+        }
+    }
+    
+    Gdiplus::GdiplusShutdown(gdiplusToken);
     EndPaint(hWnd, &ps);
 }
 
