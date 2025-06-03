@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <limits>
+#include <optional>
 
 
 namespace utils
@@ -11,42 +12,49 @@ namespace utils
 constexpr double EPSILON = std::numeric_limits<double>::epsilon() * 10;
 
 
-struct GAExecutionResult final
+struct GAExecutionResult 
 {
-    std::uint32_t iterations_; 
+    std::uint32_t iterations;
 
-    std::vector<double> best_qualities_; 
-    std::string solution_;
+    std::vector<double> best_qualities;         
+    std::vector<double> best_progressive_qualities; 
 
-    std::uint32_t duration_;
+    std::string solution;
+
+    std::uint32_t duration;
 };
 
 struct SAExecutionResult final
 {
-    std::uint32_t iterations_;
+    std::uint32_t iterations;
     
-    std::vector<double> best_energies_;
-    std::vector<double> temperatures_;
+    std::vector<double> best_energies;
+    std::vector<double> temperatures;
+    std::vector<double> best_progressive_qualities;
 
-    std::string solution_;
+    std::string solution;
 
-    std::uint32_t duration_;
+    std::uint32_t duration;
 };
 
 struct BHExecutionResult final
 {
-    std::uint32_t iterations_;
+    std::uint32_t iterations;
 
-    std::vector<double> best_qualities_;
-    std::string solution_;
+    std::vector<double> best_qualities;
+    std::vector<double> best_progressive_qualities;
 
-    std::uint32_t duration_;
+    std::string solution;
+
+    std::uint32_t duration;
 };
 
 struct GraphData final
 {
     std::vector<double> data_;
     std::wstring title_;
+    double y_max_;
+
 };
 
 bool DoubleEqual(const double lhs, const double rhs);
