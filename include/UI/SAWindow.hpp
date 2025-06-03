@@ -17,7 +17,7 @@ public:
     static bool RegisterSAClass(HINSTANCE hInstance);
     static HWND Create(HWND parentWindow, HINSTANCE hInstance);
 
-    static constexpr wchar_t* WINDOW_CLASS = L"CNF_Solver_SAWindow";
+    static constexpr const wchar_t* WINDOW_CLASS = L"CNF_Solver_SAWindow";
 
 private:
     static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

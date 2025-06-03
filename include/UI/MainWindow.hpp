@@ -25,7 +25,7 @@ private:
     static void OnCommand(HWND hWnd, int controlId);
     static void OnDestroy(HWND hWnd);
     
-    static constexpr wchar_t* CLASS_NAME = L"CNF_Solver_MainWindow";
+    static constexpr const wchar_t* CLASS_NAME = L"CNF_Solver_MainWindow";
 };
 
 } // namespace ui
