@@ -3,12 +3,16 @@
 
 #include <fstream>
 
+#include <algorithm>
+
 
 namespace benchmark
 {
 
-void BenchmarkGA::Run()
+utils::GAExecutionResult BenchmarkGA::Run()
 {
+    std::vector<utils::GAExecutionResult> results;
+
     std::ofstream fileBench("GA_benchmark.txt");
     if (fileBench.is_open())
     {
@@ -30,14 +34,23 @@ void BenchmarkGA::Run()
 
 
             fileBench << "Iteration benchmark number: " << i << '\n';
-            fileBench << "Duration of execution: " << result.duration_ << '\n';
-            fileBench << "Execution iteration: " << result.iterations_ << '\n';
-            fileBench << result.solution_ << '\n' << '\n';
+            fileBench << "Duration of execution: " << result.duration << '\n';
+            fileBench << "Execution iteration: " << result.iterations << '\n';
+            fileBench << result.solution << '\n' << '\n';
+
+            if (result.iterations > 1 && result.iterations < 1000 && result.duration > 0) 
+                results.emplace_back(result);
         }
     }
 
     fileBench.close();
     
+    std::sort(results.begin(), results.end(), [](const auto& a, const auto& b) { 
+            return a.duration > b.duration; 
+        }
+    );
+
+    return results.front();
 }
 
 

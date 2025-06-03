@@ -2,13 +2,15 @@
 #include <Algorithms/SimulatedAnnealing.hpp>
 
 #include <fstream>
-
+#include <algorithm>
 
 namespace benchmark
 {
 
-void BenchmarkSA::Run()
+utils::SAExecutionResult BenchmarkSA::Run()
 {
+    std::vector<utils::SAExecutionResult> results;
+
     std::ofstream fileBench("SA_benchmark.txt");
     if (fileBench.is_open())
     {
@@ -29,14 +31,23 @@ void BenchmarkSA::Run()
 
 
             fileBench << "Iteration benchmark number: " << i << '\n';
-            fileBench << "Duration of execution: " << result.duration_ << '\n';
-            fileBench << "Execution iteration: " << result.iterations_ << '\n';
-            fileBench << result.solution_ << '\n' << '\n';
+            fileBench << "Duration of execution: " << result.duration << '\n';
+            fileBench << "Execution iteration: " << result.iterations << '\n';
+            fileBench << result.solution << '\n' << '\n';
+
+            if (result.iterations > 1 && result.iterations < 1000 && result.duration > 0) 
+                results.emplace_back(result);
         }
     }
 
     fileBench.close();
     
+    std::sort(results.begin(), results.end(), [](const auto& a, const auto& b) { 
+            return a.duration > b.duration; 
+        }
+    );
+
+    return results.front();
 }
 
 

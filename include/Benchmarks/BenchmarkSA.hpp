@@ -2,14 +2,15 @@
 
 #include <Benchmarks/BenchmarkBase.hpp>
 
+#include <Utils/Utils.hpp>
 
 namespace benchmark
 {
 
-class BenchmarkSA final : public BaseBenchmark
+class BenchmarkSA final : public BaseBenchmark<utils::SAExecutionResult>
 {
 public:
-    void Run() override;
+    utils::SAExecutionResult Run() override;
 };
 
 } // namespace benchmark

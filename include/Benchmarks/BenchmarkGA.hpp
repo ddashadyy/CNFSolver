@@ -2,14 +2,15 @@
 
 #include <Benchmarks/BenchmarkBase.hpp>
 
+#include <Utils/Utils.hpp>
 
 namespace benchmark
 {
 
-class BenchmarkGA final : public BaseBenchmark
+class BenchmarkGA final : public BaseBenchmark<utils::GAExecutionResult>
 {
 public:
-    void Run() override;
+    utils::GAExecutionResult Run() override;
 };
 
 } // namespace benchmark
