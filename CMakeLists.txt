@@ -30,12 +30,7 @@ add_library(${PROJECT_NAME}_objs OBJECT
     src/Core/Candidate.cpp
     src/Core/Candidates.cpp
 
-    src/Utils/Utils.cpp
-
-    src/Benchmarks/BenchmarkBase.cpp
-    src/Benchmarks/BenchmarkBH.cpp
-    src/Benchmarks/BenchmarkGA.cpp
-    src/Benchmarks/BenchmarkSA.cpp
+    src/Utils/Utils.cpp   
 )
 
 add_library(${PROJECT_NAME}_wnd_objs OBJECT
@@ -46,9 +41,17 @@ add_library(${PROJECT_NAME}_wnd_objs OBJECT
     src/UI/GraphWindow.cpp
 )
 
+add_library(${PROJECT_NAME}_benchmark_objs OBJECT
+    src/Benchmarks/BenchmarkBH.cpp
+    src/Benchmarks/BenchmarkGA.cpp
+    src/Benchmarks/BenchmarkSA.cpp
+)
+
+
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 target_include_directories(${PROJECT_NAME}_objs PRIVATE include)
 target_include_directories(${PROJECT_NAME}_wnd_objs PRIVATE include)
+target_include_directories(${PROJECT_NAME}_benchmark_objs PRIVATE include)
 
 if(WIN32)
     set(WIN32_LIBS
@@ -72,6 +75,7 @@ endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     ${PROJECT_NAME}_objs
     ${PROJECT_NAME}_wnd_objs
+    ${PROJECT_NAME}_benchmark_objs
 )
 
 if(MINGW)
