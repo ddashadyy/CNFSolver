@@ -67,7 +67,7 @@ private:
     void LocalSearchSolutions( 
         std::vector<model::Candidate>& candidates,
         utils::selection_function sf
-    ); // aka GA::Mutate
+    ); 
 
     void AbandonWorstSolutions( std::vector<model::Candidate>& candidates ); 
 
