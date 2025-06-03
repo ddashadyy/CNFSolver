@@ -4,8 +4,12 @@
 #include <UI/SAWindow.hpp>
 #include <UI/BHWindow.hpp>
 
-#include <stdexcept>
+#include <Benchmarks/BenchmarkGA.hpp>
+#include <Benchmarks/BenchmarkBH.hpp>
+#include <Benchmarks/BenchmarkSA.hpp>
 
+#include <stdexcept>
+#include <thread>
 
 namespace ui
 {
@@ -103,9 +107,19 @@ void MainWindow::OnCreate(HWND hWnd)
     );
 
     CreateWindowW(
-        L"BUTTON", L"Справка",
+        L"BUTTON", L"Бенчмарки",
         WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
         100, 260, 200, 30,
+        hWnd,
+        reinterpret_cast<HMENU>(ID_BENCHMARKS),
+        nullptr,
+        nullptr
+    );
+
+    CreateWindowW(
+        L"BUTTON", L"Справка",
+        WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+        100, 330, 200, 30,
         hWnd,
         reinterpret_cast<HMENU>(ID_BUTTON_HELP),
         nullptr,
@@ -157,6 +171,24 @@ void MainWindow::OnCommand(HWND hWnd, int controlId)
             ShowWindow(hGAWnd, SW_SHOW);
             UpdateWindow(hGAWnd);
         }
+        break;
+    }
+
+    case ID_BENCHMARKS:
+    {
+        MessageBoxW(hWnd, L"Запуск бенчмарков...", L"Бенчмарки", MB_OK | MB_ICONINFORMATION);
+        
+        auto benchGA = std::make_unique<benchmark::BenchmarkGA>();
+        benchGA->Run();
+        
+        auto benchSA = std::make_unique<benchmark::BenchmarkSA>();
+        benchSA->Run();
+        
+        auto benchBH = std::make_unique<benchmark::BenchmarkBH>();
+        benchBH->Run();
+            
+        MessageBoxW(hWnd, L"Бенчмарки записаны в файлы", L"Бенчмарки", MB_OK | MB_ICONINFORMATION);
+                
         break;
     }
 

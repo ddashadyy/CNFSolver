@@ -13,6 +13,10 @@ else()
     add_compile_options(-Wall -Wextra -Wpedantic -finput-charset=UTF-8 -fexec-charset=UTF-8)
 endif()
 
+if(MINGW)
+    add_link_options(-pthread)
+endif()
+
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++")
 
 add_executable(${PROJECT_NAME} WIN32 src/main.cpp)
@@ -27,12 +31,18 @@ add_library(${PROJECT_NAME}_objs OBJECT
     src/Core/Candidates.cpp
 
     src/Utils/Utils.cpp
+
+    src/Benchmarks/BenchmarkBase.cpp
+    src/Benchmarks/BenchmarkBH.cpp
+    src/Benchmarks/BenchmarkGA.cpp
+    src/Benchmarks/BenchmarkSA.cpp
 )
 
 add_library(${PROJECT_NAME}_wnd_objs OBJECT
     src/UI/MainWindow.cpp
     src/UI/GAWindow.cpp
     src/UI/SAWindow.cpp
+    src/UI/BHWindow.cpp
     src/UI/GraphWindow.cpp
 )
 
@@ -63,3 +73,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${PROJECT_NAME}_objs
     ${PROJECT_NAME}_wnd_objs
 )
+
+if(MINGW)
+    target_link_libraries(${PROJECT_NAME} PRIVATE pthread)
+endif()
