@@ -4,6 +4,8 @@
 #include <UI/SAWindow.hpp>
 #include <UI/BHWindow.hpp>
 
+#include <UI/GraphWindow.hpp>
+
 #include <Benchmarks/BenchmarkGA.hpp>
 #include <Benchmarks/BenchmarkBH.hpp>
 #include <Benchmarks/BenchmarkSA.hpp>
@@ -17,13 +19,20 @@ namespace ui
 
 bool MainWindow::RegisterMWClass(HINSTANCE hInstance) 
 {
-    WNDCLASSEXW wc = { sizeof(WNDCLASSEXW) };
-    wc.style = CS_HREDRAW | CS_VREDRAW;
-    wc.lpfnWndProc = WindowProc;
-    wc.hInstance = hInstance;
-    wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wc.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
-    wc.lpszClassName = CLASS_NAME;
+    WNDCLASSEXW wc = { 
+        sizeof(WNDCLASSEXW),
+        CS_HREDRAW | CS_VREDRAW,              
+        WindowProc,          
+        0,                   
+        0,                   
+        hInstance,          
+        nullptr,        
+        LoadCursor(nullptr, IDC_ARROW),          
+        reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1),                
+        nullptr,               
+        CLASS_NAME,             
+        nullptr    
+    };
 
     return RegisterClassExW(&wc) != 0;
 }
@@ -179,13 +188,46 @@ void MainWindow::OnCommand(HWND hWnd, int controlId)
         MessageBoxW(hWnd, L"Запуск бенчмарков...", L"Бенчмарки", MB_OK | MB_ICONINFORMATION);
         
         auto benchGA = std::make_unique<benchmark::BenchmarkGA>();
-        benchGA->Run();
+        auto resultGA = benchGA->Run();
+
+        HWND hGAResultGraphWnd = GraphWindow::Create(
+            hWnd, 
+            hInstance,
+            resultGA.best_progressive_qualities,
+            static_cast<double>(resultGA.duration),
+            L"Genetic Algorithm Best Progressive Qualities"
+        );
+
+        if (!hGAResultGraphWnd) 
+            MessageBoxW(hWnd, L"Failed to create graph window", L"Error", MB_ICONERROR);
         
         auto benchSA = std::make_unique<benchmark::BenchmarkSA>();
-        benchSA->Run();
+        auto resultSA = benchSA->Run();
+
+        HWND hSAResultGraphWnd = GraphWindow::Create(
+            hWnd, 
+            hInstance,
+            resultSA.best_progressive_qualities,
+            static_cast<double>(resultSA.duration),
+            L"Simulated Annealing Algorithm Best Progressive Qualities"
+        );
+
+        if (!hSAResultGraphWnd) 
+            MessageBoxW(hWnd, L"Failed to create graph window", L"Error", MB_ICONERROR);
         
         auto benchBH = std::make_unique<benchmark::BenchmarkBH>();
-        benchBH->Run();
+        auto resultBH = benchBH->Run();
+
+        HWND hBHResultGraphWnd = GraphWindow::Create(
+            hWnd, 
+            hInstance,
+            resultBH.best_progressive_qualities,
+            static_cast<double>(resultBH.duration),
+            L"Bee Hive Algorithm Best Progressive Qualities"
+        );
+
+        if (!hBHResultGraphWnd) 
+            MessageBoxW(hWnd, L"Failed to create graph window", L"Error", MB_ICONERROR);
             
         MessageBoxW(hWnd, L"Бенчмарки записаны в файлы", L"Бенчмарки", MB_OK | MB_ICONINFORMATION);
                 
@@ -220,7 +262,7 @@ void MainWindow::OnCommand(HWND hWnd, int controlId)
     }
 }
 
-void MainWindow::OnDestroy(HWND hWnd) 
+void MainWindow::OnDestroy([[maybe_unused]] HWND hWnd) 
 {
     PostQuitMessage(0);
 }

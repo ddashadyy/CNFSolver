@@ -13,14 +13,22 @@ namespace ui
 
 bool SAWindow::RegisterSAClass(HINSTANCE hInstance)
 {
-    WNDCLASSEX wc = { sizeof(WNDCLASSEX) };
-    wc.cbSize = sizeof(WNDCLASSEX);
-    wc.style = CS_HREDRAW | CS_VREDRAW;
-    wc.lpfnWndProc = WindowProc;
-    wc.hInstance = hInstance;
-    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wc.lpszClassName = WINDOW_CLASS;
+
+    WNDCLASSEXW wc = { 
+        sizeof(WNDCLASSEXW),
+        CS_HREDRAW | CS_VREDRAW,              
+        WindowProc,          
+        0,                   
+        0,                   
+        hInstance,          
+        nullptr,        
+        LoadCursor(nullptr, IDC_ARROW),          
+        reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1),                
+        nullptr,               
+        WINDOW_CLASS,             
+        nullptr    
+    };
+
 
     if (!RegisterClassEx(&wc)) 
     {
@@ -40,8 +48,8 @@ HWND SAWindow::Create(HWND parentWindow, HINSTANCE hInstance)
     {
         DWORD err = GetLastError();
         std::wstring errMsg = L"Error code: " + std::to_wstring(err);
-        MessageBox(NULL, errMsg.c_str(), L"Registration Error", MB_ICONERROR);
-        return NULL;
+        MessageBox(nullptr, errMsg.c_str(), L"Registration Error", MB_ICONERROR);
+        return nullptr;
     }
 
     HWND hGAWnd = CreateWindowEx(
@@ -51,17 +59,17 @@ HWND SAWindow::Create(HWND parentWindow, HINSTANCE hInstance)
         WS_OVERLAPPEDWINDOW | WS_VISIBLE,
         CW_USEDEFAULT, CW_USEDEFAULT, 600, 500,
         parentWindow, 
-        NULL, 
+        nullptr, 
         hInstance, 
-        NULL
+        nullptr
     );
 
     if (!hGAWnd)
     {
         DWORD err = GetLastError();
         std::wstring errMsg = L"CreateWindowEx failed, error code: " + std::to_wstring(err);
-        MessageBox(NULL, errMsg.c_str(), L"Window Creation Error", MB_ICONERROR);
-        return NULL;
+        MessageBox(nullptr, errMsg.c_str(), L"Window Creation Error", MB_ICONERROR);
+        return nullptr;
     }
 
     ShowWindow(hGAWnd, SW_SHOW);
@@ -112,74 +120,74 @@ void SAWindow::CreateControls(HWND hWnd)
 
     CreateWindowW(L"STATIC", L"Настройки алгоритма имитации отжига для задачи выполнимости КНФ",
                     WS_VISIBLE | WS_CHILD,
-                    20, 20, 500, 25, hWnd, NULL, NULL, NULL);
+                    20, 20, 500, 25, hWnd, nullptr, nullptr, nullptr);
 
     CreateWindowW(L"STATIC", L"Размер функции (переменных):",
                     WS_VISIBLE | WS_CHILD,
-                    20, 60, 200, 20, hWnd, NULL, NULL, NULL);
+                    20, 60, 200, 20, hWnd, nullptr, nullptr, nullptr);
     CreateWindowW(L"EDIT", L"10",
                     WS_VISIBLE | WS_CHILD | WS_BORDER | ES_NUMBER,
-                    220, 60, 100, 20, hWnd, (HMENU)IDC_VARIABLES_EDIT, NULL, NULL);
+                    220, 60, 100, 20, hWnd, reinterpret_cast<HMENU>(IDC_VARIABLES_EDIT), nullptr, nullptr);
 
     CreateWindowW(L"STATIC", L"Количество итераций:",
                     WS_VISIBLE | WS_CHILD,
-                    20, 90, 200, 20, hWnd, NULL, NULL, NULL);
+                    20, 90, 200, 20, hWnd, nullptr, nullptr, nullptr);
     CreateWindowW(L"EDIT", L"1000",
                     WS_VISIBLE | WS_CHILD | WS_BORDER | ES_NUMBER,
-                    220, 90, 100, 20, hWnd, (HMENU)IDC_ITERATIONS_EDIT, NULL, NULL);
+                    220, 90, 100, 20, hWnd, reinterpret_cast<HMENU>(IDC_ITERATIONS_EDIT), nullptr, nullptr);
 
     CreateWindowW(L"STATIC", L"Начальная температура:",
                     WS_VISIBLE | WS_CHILD,
-                    20, 120, 200, 20, hWnd, NULL, NULL, NULL);
+                    20, 120, 200, 20, hWnd, nullptr, nullptr, nullptr);
     CreateWindowW(L"EDIT", L"100.0",
                     WS_VISIBLE | WS_CHILD | WS_BORDER | ES_NUMBER,
-                    220, 120, 100, 20, hWnd, (HMENU)IDC_INITIAL_TEMP_EDIT, NULL, NULL);
+                    220, 120, 100, 20, hWnd, reinterpret_cast<HMENU>(IDC_INITIAL_TEMP_EDIT), nullptr, nullptr);
 
     CreateWindowW(L"STATIC", L"Минимальная температура:",
                     WS_VISIBLE | WS_CHILD,
-                    20, 150, 200, 20, hWnd, NULL, NULL, NULL);
+                    20, 150, 200, 20, hWnd, nullptr, nullptr, nullptr);
     CreateWindowW(L"EDIT", L"1.0",
                     WS_VISIBLE | WS_CHILD | WS_BORDER | ES_NUMBER,
-                    220, 150, 100, 20, hWnd, (HMENU)IDC_MINIMAL_TEMP_EDIT, NULL, NULL);
+                    220, 150, 100, 20, hWnd, reinterpret_cast<HMENU>(IDC_MINIMAL_TEMP_EDIT), nullptr, nullptr);
 
     CreateWindowW(L"STATIC", L"Коэффициент охлаждения:",
                     WS_VISIBLE | WS_CHILD,
-                    20, 180, 200, 20, hWnd, NULL, NULL, NULL);
+                    20, 180, 200, 20, hWnd, nullptr, nullptr, nullptr);
     CreateWindowW(L"EDIT", L"0.95",
                     WS_VISIBLE | WS_CHILD | WS_BORDER | ES_NUMBER,
-                    220, 180, 100, 20, hWnd, (HMENU)IDC_COOLING_RATE_EDIT, NULL, NULL);
+                    220, 180, 100, 20, hWnd, reinterpret_cast<HMENU>(IDC_COOLING_RATE_EDIT), nullptr, nullptr);
 
 
     CreateWindowW(L"STATIC", L"Функция выбора:",
                     WS_VISIBLE | WS_CHILD,
-                    20, 240, 200, 20, hWnd, NULL, NULL, NULL);
-    hCoolingCombo = CreateWindowW(L"COMBOBOX", NULL,
+                    20, 240, 200, 20, hWnd, nullptr, nullptr, nullptr);
+    hCoolingCombo = CreateWindowW(L"COMBOBOX", nullptr,
                         WS_VISIBLE | WS_CHILD | WS_BORDER | CBS_DROPDOWNLIST,
-                        220, 240, 200, 100, hWnd, (HMENU)IDC_COOLING_COMBO, NULL, NULL);
+                        220, 240, 200, 100, hWnd, reinterpret_cast<HMENU>(IDC_COOLING_COMBO), nullptr, nullptr);
 
-    SendMessageW(hCoolingCombo, CB_ADDSTRING, 0, (LPARAM)L"Линейная");
-    SendMessageW(hCoolingCombo, CB_ADDSTRING, 0, (LPARAM)L"Экспоненциальная");
+    SendMessageW(hCoolingCombo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Линейная"));
+    SendMessageW(hCoolingCombo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Экспоненциальная"));
     SendMessageW(hCoolingCombo, CB_SETCURSEL, 0, 0);
 
     CreateWindowW(L"BUTTON", L"Сгенерировать КНФ",
                     WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
-                    20, 280, 180, 30, hWnd, (HMENU)IDC_GENERATE_CNF_BTN, NULL, NULL);
+                    20, 280, 180, 30, hWnd, reinterpret_cast<HMENU>(IDC_GENERATE_CNF_BTN), nullptr, nullptr);
 
     CreateWindowW(L"BUTTON", L"Сгенерировать кандидата",
                     WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
-                    220, 280, 180, 30, hWnd, (HMENU)IDC_GENERATE_CANDIDATE_BTN, NULL, NULL);
+                    220, 280, 180, 30, hWnd, reinterpret_cast<HMENU>(IDC_GENERATE_CANDIDATE_BTN), nullptr, nullptr);
 
     CreateWindowW(L"BUTTON", L"Загрузить КНФ из файла",
                     WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
-                    20, 320, 180, 30, hWnd, (HMENU)IDC_LOAD_CNF_BTN, NULL, NULL);
+                    20, 320, 180, 30, hWnd, reinterpret_cast<HMENU>(IDC_LOAD_CNF_BTN), nullptr, nullptr);
 
     CreateWindowW(L"BUTTON", L"Загрузить кандидата из файла",
                     WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
-                    220, 320, 180, 30, hWnd, (HMENU)IDC_LOAD_CANDIDATE_BTN, NULL, NULL);
+                    220, 320, 180, 30, hWnd, reinterpret_cast<HMENU>(IDC_LOAD_CANDIDATE_BTN), nullptr, nullptr);
 
     CreateWindowW(L"BUTTON", L"Выполнить алгоритм",
                     WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
-                    20, 360, 380, 30, hWnd, (HMENU)IDC_RUN_BTN, NULL, NULL);
+                    20, 360, 380, 30, hWnd, reinterpret_cast<HMENU>(IDC_RUN_BTN), nullptr, nullptr);
 
     EnumChildWindows(
         hWnd, 
@@ -281,9 +289,9 @@ void SAWindow::RunAlgorithm(HWND hWnd)
         );
         
         std::wstring message = L"Algorithm completed!\n";
-        message += L"Iterations: " + std::to_wstring(result.iterations_) + L"\n";
-        message += L"Solution: " + std::wstring(result.solution_.begin(), result.solution_.end()) + L"\n";
-        message += L"Execution time in milliseconds: " + std::to_wstring(result.duration_);
+        message += L"Iterations: " + std::to_wstring(result.iterations) + L"\n";
+        message += L"Solution: " + std::wstring(result.solution.begin(), result.solution.end()) + L"\n";
+        message += L"Execution time in milliseconds: " + std::to_wstring(result.duration);
         
         MessageBoxW(hWnd, message.c_str(), L"Results", MB_OK);
 
@@ -299,7 +307,7 @@ void SAWindow::RunAlgorithm(HWND hWnd)
         HWND hEnergiesGraphWnd = GraphWindow::Create(
             hWnd, 
             hInstance,
-            result.best_energies_,
+            result.best_energies,
             L"Simulated Annealing Algorithm Energy Progress"
         );
 
@@ -309,7 +317,7 @@ void SAWindow::RunAlgorithm(HWND hWnd)
         HWND hTemperaturesGraphWnd = GraphWindow::Create(
             hWnd, 
             hInstance,
-            result.temperatures_,
+            result.temperatures,
             L"Simulated Annealing Algorithm Temperature Progress"
         );
 
@@ -429,7 +437,7 @@ std::wstring SAWindow::OpenFileDialog(HWND hWnd, const wchar_t* filter)
 }
 
 
-double ui::SAWindow::GetDlgItemDouble(HWND hDlg, int nIDDlgItem, BOOL *lpSuccess, BOOL bSigned)
+double ui::SAWindow::GetDlgItemDouble(HWND hDlg, int nIDDlgItem, BOOL *lpSuccess, [[maybe_unused]] BOOL bSigned)
 {
     TCHAR szText[256];
     if (!GetDlgItemText(hDlg, nIDDlgItem, szText, 256)) 
