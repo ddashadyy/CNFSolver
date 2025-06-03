@@ -7,7 +7,8 @@ namespace ui
 
 constexpr int ID_BUTTON_GA = 1001;
 constexpr int ID_BUTTON_SA = 1002;
-constexpr int ID_BUTTON_HELP = 1003;
+constexpr int ID_BUTTON_BH = 1003;
+constexpr int ID_BUTTON_HELP = 1004;
 
 class MainWindow final 
 {

@@ -1,6 +1,8 @@
 #include <UI/MainWindow.hpp>
+
 #include <UI/GAWindow.hpp>
-#include "UI/SAWindow.hpp"
+#include <UI/SAWindow.hpp>
+#include <UI/BHWindow.hpp>
 
 #include <stdexcept>
 
@@ -30,7 +32,7 @@ bool MainWindow::CreateAndShow(HINSTANCE hInstance, int nCmdShow)
         L"CNF Solver",
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT,
-        400, 300,
+        400, 400,
         nullptr,
         nullptr,
         hInstance,
@@ -91,9 +93,19 @@ void MainWindow::OnCreate(HWND hWnd)
     );
 
     CreateWindowW(
+        L"BUTTON", L"Алгоритм пчелиной колонии",
+        WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+        100, 190, 200, 50,
+        hWnd,
+        reinterpret_cast<HMENU>(ID_BUTTON_BH),
+        nullptr,
+        nullptr
+    );
+
+    CreateWindowW(
         L"BUTTON", L"Справка",
         WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
-        100, 190, 200, 30,
+        100, 260, 200, 30,
         hWnd,
         reinterpret_cast<HMENU>(ID_BUTTON_HELP),
         nullptr,
@@ -126,7 +138,7 @@ void MainWindow::OnCommand(HWND hWnd, int controlId)
     {
         HWND hGAWnd = SAWindow::Create(hWnd, hInstance);
         if (!hGAWnd) 
-            MessageBoxW(hWnd, L"Failed to create GA window", L"Error", MB_ICONERROR);
+            MessageBoxW(hWnd, L"Failed to create BH window", L"Error", MB_ICONERROR);
         else 
         {
             ShowWindow(hGAWnd, SW_SHOW);
@@ -134,7 +146,19 @@ void MainWindow::OnCommand(HWND hWnd, int controlId)
         }
         break;
     }    
-    
+
+    case ID_BUTTON_BH:
+    {
+        HWND hGAWnd = BHWindow::Create(hWnd, hInstance);
+        if (!hGAWnd) 
+            MessageBoxW(hWnd, L"Failed to create BH window", L"Error", MB_ICONERROR);
+        else 
+        {
+            ShowWindow(hGAWnd, SW_SHOW);
+            UpdateWindow(hGAWnd);
+        }
+        break;
+    }
 
     case ID_BUTTON_HELP:
     {
@@ -142,12 +166,13 @@ void MainWindow::OnCommand(HWND hWnd, int controlId)
             L"CNF Solver - программа для решения задачи выполнимости КНФ.\n\n"
             L"Функции:\n"
             L"1. Генетический алгоритм - поиск решения с использованием эволюционных методов\n"
-            L"2. Алгоритм имитации отжига - поиск решения методом имитации отжига\n\n"
-            L"Инструкция:\n"
+            L"2. Алгоритм имитации отжига - поиск решения методом имитации отжига\n"
+            L"3. Алгоритм пчелиной колонии - поиск решения с использованием эвристических методов\n\n"
+            L"Инструкция:\n\n"
             L"Если хотите использовать случайные данные:\n"
             L"1. Выберите алгоритм\n"
             L"2. Настройте параметры\n"
-            L"3. Запустите расчет\n"
+            L"3. Запустите расчет\n\n"
             L"Если хотите использовать свои данные:\n"
             L"1. Запиши свои данные в соответсвующие файлы и формате\n"
             L"Например, КНФ: (x1 | x2 | x3) & (x2 | x1 | x3) & (x3 | x1 | x2)\n"

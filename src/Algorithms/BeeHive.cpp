@@ -90,12 +90,15 @@ void BeeHive::ScoutBeePhase(
     utils::selection_function sf
 ) 
 {
+
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+
     switch (sf) 
     {
     case utils::selection_function::kRandom: 
     {
-        std::random_device rd;
-        std::mt19937 gen(rd());
+        
         std::shuffle(candidates.begin(), candidates.end(), gen);
 
         break;
@@ -104,8 +107,6 @@ void BeeHive::ScoutBeePhase(
     case utils::selection_function::kLinear: 
     {
         std::vector<double> weights(candidates.size(), 1.0);
-        std::random_device rd;
-        std::mt19937 gen(rd());
         std::discrete_distribution<size_t> dist(weights.begin(), weights.end());
         
 
@@ -127,10 +128,7 @@ void BeeHive::ScoutBeePhase(
         std::vector<double> weights;
         for (std::size_t i = 0; i < candidates.size(); ++i) 
             weights.push_back(1.0 / (i + 1)); 
-        
-        
-        std::random_device rd;
-        std::mt19937 gen(rd());
+
         std::discrete_distribution<size_t> dist(weights.begin(), weights.end());
         
         std::vector<model::Candidate> shuffled;
@@ -168,6 +166,8 @@ std::vector<double> BeeHive::ForagerBeePhase(
     for (const auto& candidate : candidates)
         probabilities.push_back(candidate.GetQuality() / totalQuality);
 
+    probabilities.resize(kForagers);
+
     return probabilities;    
 }
 
@@ -178,7 +178,7 @@ void BeeHive::OnlookerBeePhase(
 )
 {
     std::sort(candidates.begin(), candidates.end(), 
-        [](const model::Candidate &lhs, const model::Candidate &rhs) { 
+        [](const model::Candidate& lhs, const model::Candidate& rhs) { 
             return lhs.GetQuality() > rhs.GetQuality(); 
         }
     );
@@ -257,8 +257,8 @@ void BeeHive::Mutate(
     if (length == 0) return;
     
 
-    std::random_device rd;
-    std::mt19937 gen(rd());
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
     
     switch (mutation_strategy) 
     {
