@@ -4,7 +4,6 @@
 #include <sstream>
 #include <random>
 
-
 namespace model
 {
 
@@ -47,14 +46,14 @@ std::vector<std::string> CNF::SplitCNF() const
 
     while (std::getline(iss, token, delimiter))
     {
-        std::string cleaned = TrimAndCLean(token);
+        std::string cleaned = TrimAndClean(token);
         if (!cleaned.empty())
             result.push_back(cleaned);
     }
 
     if (result.empty())
     {
-        std::string cleaned = TrimAndCLean(this->cnf_str_);
+        std::string cleaned = TrimAndClean(this->cnf_str_);
         if (!cleaned.empty())
             result.push_back(cleaned);
     }
@@ -134,7 +133,7 @@ std::string CNF::GenerateRandomCNF(
 }
 
 
-std::string CNF::TrimAndCLean(const std::string& kString) const
+std::string CNF::TrimAndClean(const std::string& kString) const
 {
     if (kString.empty())
         return kString;

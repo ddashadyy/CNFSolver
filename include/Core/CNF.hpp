@@ -26,7 +26,7 @@ private:
         const std::uint32_t kMaxClauseLength
     ) const;
 
-    std::string TrimAndCLean( const std::string& kString ) const;
+    std::string TrimAndClean( const std::string& kString ) const;
 
     std::string cnf_str_;
 };
