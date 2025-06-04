@@ -364,7 +364,7 @@ bool GAWindow::LoadCNFFromFile(HWND hWnd, const std::wstring& filePath)
         }
 
         std::string fileCNF{};
-        file >> fileCNF;
+        std::getline(file, fileCNF);
         currentCNF = new model::CNF(std::move(fileCNF));
         
         file.close();
