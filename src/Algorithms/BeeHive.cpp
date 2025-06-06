@@ -7,7 +7,6 @@
 #include <unordered_set>
 
 
-
 namespace algorithm
 {
     
@@ -20,7 +19,6 @@ BeeHive::BeeHive(
     model::CNF&& kCNF, 
     model::Candidates&& kCandidates
 ) noexcept : AlgorithmBase(std::move(kCNF)), candidates_(std::make_unique<model::Candidates>(std::move(kCandidates))) {}
-
 
 
 const utils::BHExecutionResult BeeHive::Execute(
@@ -105,7 +103,6 @@ void BeeHive::ScoutBeePhase(
     utils::selection_function sf
 ) 
 {
-
     static std::random_device rd;
     static std::mt19937 gen(rd());
 
@@ -160,7 +157,7 @@ void BeeHive::ScoutBeePhase(
     default:
         break;
     }
-    
+
     candidates.resize(kScouts);
 }
 
@@ -190,28 +187,39 @@ void BeeHive::OnlookerBeePhase(
     const std::uint32_t kOnlookers,
     const std::vector<double>& kProbabilities,
     std::vector<model::Candidate>& candidates
-)
-{
+) {
+    if (candidates.empty()) return;
+
     std::sort(candidates.begin(), candidates.end(), 
         [](const model::Candidate& lhs, const model::Candidate& rhs) { 
             return lhs.GetQuality() > rhs.GetQuality(); 
         }
     );
 
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
+    if (kProbabilities.empty()) return;
+    
+
+    thread_local std::random_device rd;
+    thread_local std::mt19937 gen(rd());
     std::discrete_distribution<std::size_t> dist(kProbabilities.begin(), kProbabilities.end());
 
-
     std::unordered_set<std::size_t> selected_indices;
-    while (selected_indices.size() < std::min(kOnlookers, static_cast<std::uint32_t>(candidates.size()))) 
+    size_t max_attempts = 1000;
+    const size_t target_size = std::min(kOnlookers, static_cast<std::uint32_t>(candidates.size()));
+
+    while (selected_indices.size() < target_size && max_attempts-- > 0) 
         selected_indices.insert(dist(gen));
     
 
     std::vector<model::Candidate> selected;
     selected.reserve(selected_indices.size());
     for (size_t idx : selected_indices) 
-        selected.push_back(std::move(candidates[idx]));
+    {
+        if (idx >= candidates.size()) 
+            continue;
+        
+        selected.push_back(candidates[idx]);
+    }
 
     candidates = std::move(selected);
 }
@@ -240,11 +248,27 @@ void BeeHive::AbandonWorstSolutions(
     std::vector<model::Candidate>& candidates
 )
 {
-    for (auto it = candidates.cbegin(); it != candidates.cend(); ++it)
+    auto new_end = std::remove_if(candidates.begin(), candidates.end(),
+        [](const model::Candidate& c) {
+            return utils::DoubleLess(c.GetQuality(), 0.75f);
+        }
+    );
+
+    if (new_end == candidates.begin()) 
     {
-        if (utils::DoubleLess(it->GetQuality(), 0.75f))
-            it = candidates.erase(it);
-    }
+        if (!candidates.empty()) 
+        {
+            auto best = std::max_element(candidates.begin(), candidates.end(),
+                [](const model::Candidate& a, const model::Candidate& b) {
+                    return a.GetQuality() < b.GetQuality();
+                }
+            );
+    
+            candidates.erase(candidates.begin(), best);
+            candidates.erase(best + 1, candidates.end());
+        }
+    } 
+    else candidates.erase(new_end, candidates.end());
 }
 
 void BeeHive::RestorePopulation(
@@ -252,7 +276,7 @@ void BeeHive::RestorePopulation(
     std::vector<model::Candidate>& candidates
 ) 
 {
-    const size_t current_size = candidates.size();
+    const std::size_t current_size = candidates.size();
     if (current_size >= kTargetPopulation) return;
 
     candidates.reserve(kTargetPopulation);
