@@ -1,90 +1,72 @@
 #pragma once
 
-
 #include <Core/AlgorithmBase.hpp>
 #include <Core/Candidates.hpp>
-
 #include <Enums/AlgorithmTypes.hpp>
 #include <Utils/Utils.hpp>
-
 #include <vector>
+#include <map>
+#include <optional>
 
-namespace algorithm
+namespace algorithm 
 {
 
-class BeeHive final 
-    : public AlgorithmBase<
-            utils::BHExecutionResult,
-            std::uint32_t,
-            std::uint32_t,
-            std::uint32_t,
-            std::uint32_t,
-            std::uint32_t,
-            utils::selection_function
-        >
+class BeeHive final : public AlgorithmBase<
+    utils::BHExecutionResult,
+    std::uint32_t,
+    std::uint32_t,
+    std::uint32_t,
+    std::uint32_t,
+    double
+> 
 {
 public:
-    BeeHive( 
-        const model::CNF& kCNF, 
-        const model::Candidates& kCandidates 
-    );
-
-    BeeHive(
-        model::CNF&& cnf,
-        model::Candidates&& candidates
-    ) noexcept;
-
+    BeeHive( const model::CNF& cnf, const model::Candidates& candidates );
+    BeeHive( model::CNF&& cnf, model::Candidates&& candidates ) noexcept;
     ~BeeHive() = default;
 
     const utils::BHExecutionResult Execute(
-        const std::uint32_t kIterations,
-        const std::uint32_t kPopulation,
-        const std::uint32_t kScouts,
-        const std::uint32_t kForagers,
-        const std::uint32_t kOnlookers,
-        utils::selection_function sf
+        const std::uint32_t iterations,
+        const std::uint32_t scouts,
+        const std::uint32_t honey_planters,
+        const std::uint32_t surroundings,
+        const double exclude_rate
     ) override;
 
 private:
+    std::vector<model::Candidate> CreateHoneyPlanters(
+        const std::vector<model::Candidate>& candidates,
+        const std::uint32_t honey_planters
+    ) const;
 
-    void ScoutBeePhase( 
-        const std::uint32_t kScouts,
-        std::vector<model::Candidate>& candidates,
-        utils::selection_function sf
-    );
+    std::vector<model::Candidate> ExcludeWorst(
+        std::vector<model::Candidate> candidates,
+        const double exclude_rate
+    ) const;
 
-    std::vector<double> ForagerBeePhase( 
-        const std::uint32_t kForagers,
-        std::vector<model::Candidate>& candidates
-    );
+    std::map<model::Candidate, std::uint32_t> DistributeHoneyPlanters(
+        const std::vector<model::Candidate>& best_candidates,
+        const std::uint32_t honey_planters
+    ) const;
 
-    void OnlookerBeePhase( 
-        const std::uint32_t kOnlookers,
-        const std::vector<double>& kProbabilities,
-        std::vector<model::Candidate>& candidates
-    );
+    std::vector<model::Candidate> CreateNewHoneyPlanters(
+        const std::map<model::Candidate, std::uint32_t>& distributed_bees,
+        const std::uint32_t honey_planters,
+        const std::uint32_t surroundings
+    ) const;
 
-    void LocalSearchSolutions( 
-        std::vector<model::Candidate>& candidates,
-        utils::selection_function sf
-    ); 
+    model::Candidate Mutate(
+        const model::Candidate& candidate,
+        const std::uint32_t surroundings
+    ) const;
 
-    void AbandonWorstSolutions( std::vector<model::Candidate>& candidates ); 
+    std::vector<model::Candidate> RestorePopulation(
+        std::vector<model::Candidate> candidates,
+        const std::uint32_t target_population
+    ) const;
 
-    void RestorePopulation(
-        const std::uint32_t kTargetPopulation,
-        std::vector<model::Candidate>& candidates
-    );
-
-
-    void Mutate(
-        model::Candidate& candidate,
-        utils::selection_function mutation_strategy
-    );
-
-    
+    model::Candidate best_candidate_;
     std::unique_ptr<model::Candidates> candidates_;
 };
-
 
 } // namespace algorithm
