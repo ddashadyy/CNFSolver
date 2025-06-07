@@ -302,8 +302,9 @@ void GraphWindow::OnPaint(HWND hWnd, const std::vector<double>& yData, const std
         double minX = 0.0;
         double maxX = xMax;
 
-        double minY = 0.0;
-        double maxY = 1.0; 
+        double minY = *std::min_element(yData.begin(), yData.end());
+        double maxY = *std::max_element(yData.begin(), yData.end());
+        if (maxY == minY) maxY = minY + 1.0; 
 
         Gdiplus::Pen axisPen(Gdiplus::Color(0, 0, 0), 2);
         graphics.DrawLine(&axisPen, 
@@ -350,8 +351,8 @@ void GraphWindow::OnPaint(HWND hWnd, const std::vector<double>& yData, const std
             float x1 = plotArea.X + ((i-1) / static_cast<float>(yData.size()-1)) * plotArea.Width;
             float x2 = plotArea.X + (i / static_cast<float>(yData.size()-1)) * plotArea.Width;
 
-            float y1 = plotArea.GetBottom() - static_cast<float>(yData[i-1] / maxY * plotArea.Height);
-            float y2 = plotArea.GetBottom() - static_cast<float>(yData[i] / maxY * plotArea.Height);
+            float y1 = plotArea.GetBottom() - static_cast<float>((yData[i-1] - minY) / (maxY - minY)) * plotArea.Height;
+            float y2 = plotArea.GetBottom() - static_cast<float>((yData[i] - minY) / (maxY - minY)) * plotArea.Height;
             
             graphics.DrawLine(&dataPen, x1, y1, x2, y2);
         }

@@ -24,13 +24,12 @@ private:
     
     enum
     {
-        IDC_ITERATIONS_EDIT = 1001,
-        IDC_VARIABLES_EDIT,
-        IDC_POPULATION_EDIT,
+        IDC_VARIABLES_EDIT = 1001,
+        IDC_ITERATIONS_EDIT,
         IDC_SCOUTS_EDIT,
         IDC_FORAGERS_EDIT,
-        IDC_ONLOOKERS_EDIT,
-        IDC_SELECTION_COMBO,
+        IDC_SURROUNDINGS_EDIT,
+        IDC_EXCLUDING_RATE_EDIT,
         IDC_GENERATE_CNF_BTN,
         IDC_GENERATE_CANDIDATES_BTN,
         IDC_LOAD_CNF_BTN,
@@ -48,6 +47,8 @@ private:
     static bool LoadCNFFromFile(HWND hWnd, const std::wstring& filePath);
     static bool LoadCandidatesFromFile(HWND hWnd, const std::wstring& filePath);
     static std::wstring OpenFileDialog(HWND hWnd, const wchar_t* filter);
+
+    static double GetDlgItemDouble(HWND hDlg, int nIDDlgItem, BOOL *lpSuccess = nullptr, BOOL bSigned = TRUE);
     
     static inline model::CNF* currentCNF = nullptr;
     static inline model::Candidates* currentCandidates = nullptr;

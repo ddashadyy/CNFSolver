@@ -57,7 +57,7 @@ HWND BHWindow::Create(HWND parentWindow, HINSTANCE hInstance)
     HWND hGAWnd = CreateWindowEx(
         WS_EX_APPWINDOW, 
         WINDOW_CLASS,
-        L"Алгоритм пчелиной колонии",
+        L"Алгоритм пчелиного улья",
         WS_OVERLAPPEDWINDOW | WS_VISIBLE,
         CW_USEDEFAULT, CW_USEDEFAULT, 600, 500,
         parentWindow, 
@@ -113,7 +113,6 @@ void BHWindow::OnCreate(HWND hWnd)
 
 void BHWindow::CreateControls(HWND hWnd) 
 {
-    static HWND hSelectionCombo;
     static HFONT hFont;
 
     hFont = CreateFont(16, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
@@ -121,7 +120,7 @@ void BHWindow::CreateControls(HWND hWnd)
                            CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
                            DEFAULT_PITCH | FF_DONTCARE, L"Arial");
 
-    CreateWindowW(L"STATIC", L"Настройки алгоритма пчелиной колонии для задачи выполнимости КНФ",
+    CreateWindowW(L"STATIC", L"Настройки алгоритма пчелиного улья для задачи выполнимости КНФ",
                     WS_VISIBLE | WS_CHILD,
                     20, 20, 500, 25, hWnd, nullptr, nullptr, nullptr);
 
@@ -139,45 +138,33 @@ void BHWindow::CreateControls(HWND hWnd)
                     WS_VISIBLE | WS_CHILD | WS_BORDER | ES_NUMBER,
                     220, 90, 100, 20, hWnd, reinterpret_cast<HMENU>(IDC_ITERATIONS_EDIT), nullptr, nullptr);
 
-    CreateWindowW(L"STATIC", L"Размер популяции:",
+    CreateWindowW(L"STATIC", L"Количество разведчиков:",
                     WS_VISIBLE | WS_CHILD,
                     20, 120, 200, 20, hWnd, nullptr, nullptr, nullptr);
     CreateWindowW(L"EDIT", L"10",
                     WS_VISIBLE | WS_CHILD | WS_BORDER | ES_NUMBER,
-                    220, 120, 100, 20, hWnd, reinterpret_cast<HMENU>(IDC_POPULATION_EDIT), nullptr, nullptr);
+                    220, 120, 100, 20, hWnd, reinterpret_cast<HMENU>(IDC_SCOUTS_EDIT), nullptr, nullptr);
                     
-    CreateWindowW(L"STATIC", L"Количество разведчиков:",
+    CreateWindowW(L"STATIC", L"Количество медоносов:",
                     WS_VISIBLE | WS_CHILD,
                     20, 150, 200, 20, hWnd, nullptr, nullptr, nullptr);
-    CreateWindowW(L"EDIT", L"5",
+    CreateWindowW(L"EDIT", L"10",
                     WS_VISIBLE | WS_CHILD | WS_BORDER | ES_NUMBER,
-                    220, 150, 100, 20, hWnd, reinterpret_cast<HMENU>(IDC_SCOUTS_EDIT), nullptr, nullptr);
+                    220, 150, 100, 20, hWnd, reinterpret_cast<HMENU>(IDC_FORAGERS_EDIT), nullptr, nullptr);
 
-    CreateWindowW(L"STATIC", L"Количество фуражиров:",
+    CreateWindowW(L"STATIC", L"Количество окресностей:",
                     WS_VISIBLE | WS_CHILD,
                     20, 180, 200, 20, hWnd, nullptr, nullptr, nullptr);
-    CreateWindowW(L"EDIT", L"5",
+    CreateWindowW(L"EDIT", L"2",
                     WS_VISIBLE | WS_CHILD | WS_BORDER | ES_NUMBER,
-                    220, 180, 100, 20, hWnd, reinterpret_cast<HMENU>(IDC_FORAGERS_EDIT), nullptr, nullptr);
+                    220, 180, 100, 20, hWnd, reinterpret_cast<HMENU>(IDC_SURROUNDINGS_EDIT), nullptr, nullptr);
 
-    CreateWindowW(L"STATIC", L"Количество наблюдателей:",
+    CreateWindowW(L"STATIC", L"Коэффициент исключения:",
                     WS_VISIBLE | WS_CHILD,
                     20, 210, 200, 20, hWnd, nullptr, nullptr, nullptr);
-    CreateWindowW(L"EDIT", L"5",
+    CreateWindowW(L"EDIT", L"0.65",
                     WS_VISIBLE | WS_CHILD | WS_BORDER | ES_NUMBER,
-                    220, 210, 100, 20, hWnd, reinterpret_cast<HMENU>(IDC_ONLOOKERS_EDIT), nullptr, nullptr);
-
-    CreateWindowW(L"STATIC", L"Функция выбора:",
-                    WS_VISIBLE | WS_CHILD,
-                    20, 240, 200, 20, hWnd, nullptr, nullptr, nullptr);
-    hSelectionCombo = CreateWindowW(L"COMBOBOX", nullptr,
-                    WS_VISIBLE | WS_CHILD | WS_BORDER | CBS_DROPDOWNLIST,
-                    220, 240, 200, 100, hWnd, reinterpret_cast<HMENU>(IDC_SELECTION_COMBO), nullptr, nullptr);
-
-    SendMessageW(hSelectionCombo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Случайная"));
-    SendMessageW(hSelectionCombo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Линейная"));
-    SendMessageW(hSelectionCombo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Экспоненциальная"));
-    SendMessageW(hSelectionCombo, CB_SETCURSEL, 0, 0);
+                    220, 210, 100, 20, hWnd, reinterpret_cast<HMENU>(IDC_EXCLUDING_RATE_EDIT), nullptr, nullptr);
 
     CreateWindowW(L"BUTTON", L"Сгенерировать КНФ",
                     WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
@@ -232,8 +219,11 @@ void BHWindow::OnCommand(HWND hWnd, int controlId)
         
         case IDC_GENERATE_CANDIDATES_BTN: 
         {
-            const std::uint32_t kPopSize = GetDlgItemInt(hWnd, IDC_POPULATION_EDIT, nullptr, FALSE);
+            const std::uint32_t kScouts = GetDlgItemInt(hWnd, IDC_SCOUTS_EDIT, nullptr, FALSE);
+            const std::uint32_t kForagers = GetDlgItemInt(hWnd, IDC_FORAGERS_EDIT, nullptr, FALSE);
             const std::uint32_t kVarCount = GetDlgItemInt(hWnd, IDC_VARIABLES_EDIT, nullptr, FALSE);
+
+            const std::uint32_t kPopulation = kScouts + kForagers;
 
             if (currentCandidates != nullptr) 
             {
@@ -241,7 +231,7 @@ void BHWindow::OnCommand(HWND hWnd, int controlId)
                 currentCandidates = nullptr;
             }
 
-            currentCandidates = new model::Candidates(kPopSize, kVarCount);
+            currentCandidates = new model::Candidates(kPopulation, kVarCount);
 
             MessageBoxW(hWnd, L"Candidates generated successfully", L"Success", MB_OK);
             break;
@@ -282,23 +272,19 @@ void BHWindow::RunAlgorithm(HWND hWnd)
     try 
     {
         const std::uint32_t kIterations = GetDlgItemInt(hWnd, IDC_ITERATIONS_EDIT, nullptr, FALSE);
-        const std::uint32_t kPopulation = GetDlgItemInt(hWnd, IDC_POPULATION_EDIT, nullptr, FALSE);
         const std::uint32_t kScouts = GetDlgItemInt(hWnd, IDC_SCOUTS_EDIT, nullptr, FALSE);
         const std::uint32_t kForagers = GetDlgItemInt(hWnd, IDC_FORAGERS_EDIT, nullptr, FALSE);
-        const std::uint32_t kOnLookers = GetDlgItemInt(hWnd, IDC_ONLOOKERS_EDIT, nullptr, FALSE);
-        
-        HWND hCombo = GetDlgItem(hWnd, IDC_SELECTION_COMBO);
-        int selectionMethod = SendMessage(hCombo, CB_GETCURSEL, 0, 0);
+        const std::uint32_t kSurroundings = GetDlgItemInt(hWnd, IDC_SURROUNDINGS_EDIT, nullptr, FALSE);
+        const double kExcludingRate = GetDlgItemDouble(hWnd, IDC_EXCLUDING_RATE_EDIT);
         
         currentAlgorithm = new algorithm::BeeHive(*currentCNF, *currentCandidates);
         
         const auto result = currentAlgorithm->Execute(
-            kIterations, 
-            kPopulation, 
+            kIterations,  
             kScouts, 
             kForagers, 
-            kOnLookers, 
-            static_cast<utils::selection_function>(selectionMethod)
+            kSurroundings,
+            kExcludingRate
         );
         
         std::wstring message = L"Algorithm completed!\n";
@@ -440,6 +426,24 @@ std::wstring BHWindow::OpenFileDialog(HWND hWnd, const wchar_t* filter)
         return fileName;
     
     return L"";
+}
+
+double BHWindow::GetDlgItemDouble(HWND hDlg, int nIDDlgItem, BOOL *lpSuccess, [[maybe_unused]] BOOL bSigned)
+{
+    TCHAR szText[256];
+    if (!GetDlgItemText(hDlg, nIDDlgItem, szText, 256)) 
+    {
+        if (lpSuccess) *lpSuccess = FALSE;
+        return 0.0;
+    }
+
+    TCHAR* endPtr;
+    double value = _tcstod(szText, &endPtr);
+
+    if (lpSuccess) 
+        *lpSuccess = (endPtr != szText);
+
+    return value;
 }
 
 
