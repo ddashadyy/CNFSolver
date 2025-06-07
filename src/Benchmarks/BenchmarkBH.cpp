@@ -24,11 +24,10 @@ utils::BHExecutionResult BenchmarkBH::Run()
 
             const auto result = algorithm->Execute(
                 1000,
-                10,
                 5,
                 5,
-                5,
-                utils::selection_function::kExponential
+                3,
+                0.65f 
             );
 
 
