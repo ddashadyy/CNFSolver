@@ -2,6 +2,9 @@
 
 #include <fstream>
 #include <random>
+#include <memory>
+#include <functional>
+
 
 namespace model
 {
@@ -30,6 +33,11 @@ Candidate::Candidate(std::string&& string)
 }
 
 std::string& Candidate::GetFunction()
+{
+    return this->function_;
+}
+
+const std::string& model::Candidate::GetFunction() const
 {
     return this->function_;
 }
@@ -133,4 +141,12 @@ bool Candidate::EvaluateDisjunct(const std::string& kDisjunct) const
     return false;
 }
 
+bool Candidate::operator < (
+    const Candidate& other
+) const
+{
+    return this->quality_ < other.quality_;
+}
+
 } // namespace model
+

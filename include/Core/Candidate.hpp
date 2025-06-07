@@ -19,13 +19,19 @@ public:
     ~Candidate() = default;
 
     std::string& GetFunction();
-    void SetFunction(const std::string& kFunction);
+    const std::string& GetFunction() const;
+
+    void SetFunction( const std::string& kFunction );
+
     double GetQuality() const;
-    void EvaluateQualityFunction(const CNF& kCNF);
+    
+    void EvaluateQualityFunction( const CNF& kCNF );
+
+    bool operator < ( const Candidate& other ) const;
 
 private:
-    std::string GenerateRandomBooleanFunction(const std::uint32_t kLength) const;
-    bool EvaluateDisjunct(const std::string& kDisjunct) const;
+    std::string GenerateRandomBooleanFunction( const std::uint32_t kLength ) const;
+    bool EvaluateDisjunct( const std::string& kDisjunct ) const;
 
     std::string function_;
     double quality_;
@@ -33,3 +39,5 @@ private:
 
 
 } // namespace model
+
+
